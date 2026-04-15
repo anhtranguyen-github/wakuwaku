@@ -38,10 +38,7 @@ dist/
 # Project specific
 README.md
 CLAUDE.md
-EXAMPLES.md
-docs/
+resources/
 tests/
-test_*.py
-test_*.sh
-hanachan-hanachan-wanikani-api-merged.yaml
-schema.sql
+scripts/
+skills/
