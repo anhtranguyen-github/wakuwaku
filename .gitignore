@@ -73,6 +73,11 @@ dmypy.json
 .venv/
 # Scratch and Debug
 scratch/
-scripts/
+hanachan-v2.db
+*.txt
+kanjischool/dist/
+
 *.log
 *.pid
+
+node_modules/
