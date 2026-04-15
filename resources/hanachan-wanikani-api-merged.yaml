@@ -1,0 +1,2002 @@
+# WaniKani API v2 Documentation
+# Base URL: https://api.wanikani.com/v2
+# Authorization: Bearer token (API key)
+# Revision: 20170710
+# This is a merged/complete API specification for building a WaniKani backend clone
+
+openapi: 3.0.3
+info:
+  title: WaniKani API v2
+  version: "20170710"
+  description: |
+    API for WaniKani - A spaced repetition system for learning Japanese kanji.
+    This is a complete specification merged from original WaniKani API docs.
+  contact:
+    url: https://www.wanikani.com
+
+servers:
+  - url: https://api.wanikani.com/v2
+    description: Production API
+
+security:
+  - BearerAuth: []
+
+paths:
+  # =============================================================================
+  # User
+  # =============================================================================
+  /user:
+    get:
+      summary: Get User
+      description: Returns user information including subscription status and profile
+      operationId: getUser
+      tags:
+        - User
+      responses:
+        "200":
+          description: User object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiUser"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  # =============================================================================
+  # Assignments
+  # =============================================================================
+  /assignments:
+    get:
+      operationId: getAssignments
+      summary: Get All Assignments
+      description: Returns a collection of all assignments, ordered by ascending created_at, 500 at a time.
+      tags: [Assignment]
+      parameters:
+        - in: query
+          name: available_after
+          description: Only assignments available at or after this time are returned.
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: available_before
+          description: Only assignments available at or before this time are returned.
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: burned
+          description: When set to true, returns assignments that have a value in data.burned_at. Returns assignments with a null data.burned_at if false.
+          schema:
+            type: boolean
+        - in: query
+          name: hidden
+          description: Return assignments with a matching value in the hidden attribute
+          schema:
+            type: boolean
+        - in: query
+          name: ids
+          description: Only assignments where data.id matches one of the array values are returned.
+          schema:
+            type: array
+            items:
+              type: integer
+        - in: query
+          name: immediately_available_for_lessons
+          description: Returns assignments which are immediately available for lessons
+          schema:
+            type: boolean
+        - in: query
+          name: immediately_available_for_review
+          description: Returns assignments which are immediately available for review
+          schema:
+            type: boolean
+        - in: query
+          name: in_review
+          description: Returns assignments which are in the review state
+          schema:
+            type: boolean
+        - in: query
+          name: levels
+          description: Only assignments where the associated subject level matches one of the array values are returned. Valid values range from 1 to 60.
+          schema:
+            type: array
+            items:
+              type: integer
+        - in: query
+          name: srs_stages
+          description: Only assignments where data.srs_stage matches one of the array values are returned. Valid values range from 0 to 9
+          schema:
+            type: array
+            items:
+              type: integer
+        - in: query
+          name: started
+          description: When set to true, returns assignments that have a value in data.started_at. Returns assignments with a null data.started_at if false.
+          schema:
+            type: boolean
+        - in: query
+          name: subject_ids
+          description: Only assignments where data.subject_id matches one of the array values are returned.
+          schema:
+            type: array
+            items:
+              type: integer
+        - in: query
+          name: subject_types
+          description: "Only assignments where data.subject_type matches one of the array values are returned. Valid values are: radical, kanji, or vocabulary."
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/SubjectType"
+        - in: query
+          name: unlocked
+          description: When set to true, returns assignments that have a value in data.unlocked_at. Returns assignments with a null data.unlocked_at if false.
+          schema:
+            type: boolean
+        - in: query
+          name: updated_after
+          description: Only assignments updated after this time are returned.
+          schema:
+            type: string
+            format: date-time
+
+      responses:
+        "200":
+          description: All Assignments
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiAssignmentCollection"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+  /assignments/{id}:
+    get:
+      operationId: getAssignment
+      summary: Get a Specific Assignment
+      description: Retrieves a specific assignment by its id.
+      tags: [Assignment]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Requested Assignment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiAssignment"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+  /assignments/{id}/start:
+    put:
+      operationId: startAssignment
+      summary: Start an Assignment
+      description: Mark the assignment as started, moving the assignment from the lessons queue to the review queue. Returns the updated assignment.
+      tags: [Assignment]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                started_at:
+                  type: string
+                  format: date-time
+                  description: Custom start time (optional)
+      responses:
+        "200":
+          description: The started Assignment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiAssignment"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+  # =============================================================================
+  # Level Progressions
+  # =============================================================================
+  /level_progressions:
+    get:
+      operationId: getLevelProgressions
+      summary: Get All Level Progressions
+      description: Returns a collection of all level progressions, ordered by ascending created_at, 500 at a time.
+      tags: [Level Progression]
+      parameters:
+        - in: query
+          name: ids
+          description: Only level progressions where data.id matches one of the array values are returned.
+          schema:
+            type: array
+            items:
+              type: integer
+        - in: query
+          name: updated_after
+          description: Only level_progressions updated after this time are returned.
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: All Level Progressions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiLevelProgressionCollection"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+  /level_progressions/{id}:
+    get:
+      operationId: getLevelProgression
+      summary: Get a Specific Level Progression
+      description: Retrieves a specific level progression by its id.
+      tags: [Level Progression]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Requested Level Progression
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiLevelProgression"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+  # =============================================================================
+  # Resets
+  # =============================================================================
+  /resets:
+    get:
+      operationId: getResets
+      summary: Get All Resets
+      description: Returns a collection of all resets, ordered by ascending created_at, 500 at a time.
+      tags: [Reset]
+      parameters:
+        - in: query
+          name: ids
+          description: Only resets where data.id matches one of the array values are returned.
+          schema:
+            type: array
+            items:
+              type: integer
+        - in: query
+          description: Only resets updated after this time are returned.
+          name: updated_after
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: All Resets
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResetCollection"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+  /resets/{id}:
+    get:
+      operationId: getReset
+      summary: Get a Specific Reset
+      description: Retrieves a specific reset by its id.
+      tags: [Reset]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Requested Reset
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiReset"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+  # =============================================================================
+  # Reviews
+  # =============================================================================
+  /reviews:
+    get:
+      operationId: getReviews
+      summary: Get All Reviews
+      description: Returns a collection of all reviews, ordered by ascending created_at, 500 at a time.
+      tags: [Review]
+      parameters:
+        - in: query
+          name: ids
+          description: Only reviews where data.id matches one of the array values are returned.
+          schema:
+            type: array
+            items:
+              type: integer
+        - in: query
+          description: Only reviews updated after this time are returned.
+          name: updated_after
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: assignment_ids
+          description: Only reviews where data.assignment_id matches one of the array values are returned.
+          schema:
+            type: array
+            items:
+              type: integer
+        - in: query
+          name: subject_ids
+          description: Only reviews where data.subject_id matches one of the array values are returned.
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        "200":
+          description: All Reviews
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiReviewCollection"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+    post:
+      operationId: createReview
+      summary: Create a review
+      description: |
+        Creates a review for a specific assignment_id. Using the related subject_id is also a valid alternative to using assignment_id.
+
+        Some criteria must be met in order for a review to be created: available_at must be not null and in the past.
+
+        When a review is registered, the associated assignment and review_statistic are both updated. These are returned in the response body under resources_updated.
+      tags: [Review]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - review
+              properties:
+                review:
+                  type: object
+                  required:
+                    - assignment_id
+                    - incorrect_meaning_answers
+                    - incorrect_reading_answers
+                  properties:
+                    assignment_id:
+                      type: integer
+                    incorrect_meaning_answers:
+                      type: integer
+                    incorrect_reading_answers:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                      description: Custom review time (optional)
+      responses:
+        "200":
+          description: The registered review
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCreateReviewResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+  /reviews/{id}:
+    get:
+      operationId: getReview
+      summary: Get a Specific Review
+      description: Retrieves a specific review by its id.
+      tags: [Review]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Requested Review
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiReview"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+  # =============================================================================
+  # Review Statistics
+  # =============================================================================
+  /review_statistics:
+    get:
+      operationId: getReviewStatistics
+      summary: Get All Review Statistics
+      description: Returns a collection of all review statistics, ordered by ascending created_at, 500 at a time.
+      tags: [Review Statistics]
+      parameters:
+        - in: query
+          name: ids
+          description: Only reviews where data.id matches one of the array values are returned.
+          schema:
+            type: array
+            items:
+              type: integer
+        - in: query
+          description: Only reviews updated after this time are returned.
+          name: updated_after
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          description: Return review statistics with a matching value in the hidden attribute
+          name: hidden
+          schema:
+            type: boolean
+        - in: query
+          name: subject_ids
+          description: Only reviews where data.subject_id matches one of the array values are returned.
+          schema:
+            type: array
+            items:
+              type: integer
+        - in: query
+          name: subject_types
+          description: "Only review statistics where data.subject_type matches one of the array values are returned. Valid values are: radical, kanji, or vocabulary."
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/SubjectType"
+        - in: query
+          name: percentages_greater_than
+          description: Return review statistics where the percentage_correct is greater than the value.
+          schema:
+            type: integer
+        - in: query
+          name: percentages_less_than
+          description: Return review statistics where the percentage_correct is less than the value.
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: All Review Statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiReviewStatisticCollection"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+  /review_statistics/{id}:
+    get:
+      operationId: getReviewStatistic
+      summary: Get a Specific Review Statistic
+      description: Retrieves a specific review statistic by its id.
+      tags: [Review Statistics]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Requested Review Statistic
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiReviewStatistic"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+  # =============================================================================
+  # Spaced Repetition Systems
+  # =============================================================================
+  /spaced_repetition_systems:
+    get:
+      operationId: getSpacedRepetitionSystems
+      summary: Get All Spaced Repetition Systems
+      description: Returns a collection of all spaced repetition systems, ordered by ascending created_at, 500 at a time.
+      tags: [Spaced Repetition System]
+      parameters:
+        - in: query
+          name: hidden
+          description: Return study materials with a matching value in the hidden attribute
+          schema:
+            type: boolean
+        - in: query
+          name: ids
+          description: Only study material records where data.id matches one of the array values are returned.
+          schema:
+            type: array
+            items:
+              type: integer
+        - in: query
+          name: updated_after
+          description: Only study material records updated after this time are returned.
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: subject_ids
+          description: Only study material records where data.subject_id matches one of the array values are returned.
+          schema:
+            type: array
+            items:
+              type: integer
+        - in: query
+          name: subject_types
+          description: "Only study material records where data.subject_type matches one of the array values are returned. Valid values are: radical, kanji, or vocabulary."
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/SubjectType"
+      responses:
+        "200":
+          description: All Spaced Repetition Systems
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiSpacedRepetitionSystemCollection"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+  /spaced_repetition_systems/{id}:
+    get:
+      operationId: getSpacedRepetitionSystem
+      summary: Get a Specific Spaced Repetition System
+      description: Retrieves a specific spaced repetition system by its id.
+      tags: [Spaced Repetition System]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Requested Spaced Repetition System
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiSpacedRepetitionSystem"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+  # =============================================================================
+  # Study Materials
+  # =============================================================================
+  /study_materials:
+    get:
+      operationId: getStudyMaterials
+      summary: Get All Study Materials
+      description: Returns a collection of all study material, ordered by ascending created_at, 500 at a time.
+      tags: [Study Material]
+      parameters:
+        - in: query
+          name: ids
+          description: Only spaced_repetition_systems where data.id matches one of the array values are returned.
+          schema:
+            type: array
+            items:
+              type: integer
+        - in: query
+          name: updated_after
+          description: Only spaced_repetition_systems updated after this time are returned.
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: All Study Materials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiStudyMaterialCollection"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+    post:
+      summary: Create Study Material
+      description: Create a new study material for a subject
+      operationId: createStudyMaterial
+      tags:
+        - Study Materials
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - study_material
+              properties:
+                study_material:
+                  type: object
+                  required:
+                    - subject_id
+                  properties:
+                    subject_id:
+                      type: integer
+                    meaning_note:
+                      type: string
+                      nullable: true
+                    reading_note:
+                      type: string
+                      nullable: true
+                    meaning_synonyms:
+                      type: array
+                      items:
+                        type: string
+      responses:
+        "200":
+          description: Created study material
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiStudyMaterial"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+  /study_materials/{id}:
+    get:
+      operationId: getStudyMaterial
+      summary: Get a Specific Study Material
+      description: Retrieves a specific study material by its id.
+      tags: [Study Material]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Requested Study Material
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiStudyMaterial"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+    put:
+      summary: Update Study Material
+      description: Update an existing study material
+      operationId: updateStudyMaterial
+      tags:
+        - Study Materials
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - study_material
+              properties:
+                study_material:
+                  type: object
+                  properties:
+                    meaning_note:
+                      type: string
+                      nullable: true
+                    reading_note:
+                      type: string
+                      nullable: true
+                    meaning_synonyms:
+                      type: array
+                      items:
+                        type: string
+      responses:
+        "200":
+          description: Updated study material
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiStudyMaterial"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+  # =============================================================================
+  # Summary (Report)
+  # =============================================================================
+  /summary:
+    get:
+      operationId: getSummary
+      summary: Get Summary
+      description: Returns a summary of lessons and reviews that are available
+      tags: [Summary]
+      responses:
+        "200":
+          description: Summary object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiSummary"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+  # =============================================================================
+  # Subjects
+  # =============================================================================
+  /subjects:
+    get:
+      summary: Get Subjects
+      description: Returns a collection of subjects (radicals, kanji, vocabulary)
+      operationId: getSubjects
+      tags:
+        - Subjects
+      parameters:
+        - name: updated_after
+          in: query
+          description: Return subjects updated after this timestamp
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: Collection of subjects
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiSubjectCollection"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+  /subjects/{id}:
+    get:
+      summary: Get a Specific Subject
+      description: Retrieves a specific subject by its id
+      operationId: getSubject
+      tags:
+        - Subjects
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Subject object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiSubject"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden
+        "404":
+          description: Resource not found
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          description: Too Many Requests
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                enum:
+                  - unauthorized
+                description: Error code
+              message:
+                type: string
+                description: Error message
+    UnprocessableEntity:
+      description: Unprocessable Entity
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                enum:
+                  - unprocessable_entity
+                description: Error code
+              message:
+                type: string
+                description: Error message
+
+  schemas:
+    # =========================================================================
+    # Base Types
+    # =========================================================================
+    SubjectType:
+      type: string
+      enum:
+        - radical
+        - kanji
+        - vocabulary
+        - kana_vocabulary
+
+    ApiObject:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        object:
+          type: string
+          enum:
+            - collection
+            - report
+            - assignment
+            - kanji
+            - level_progression
+            - radical
+            - reset
+            - review_statistic
+            - review
+            - spaced_repetition_system
+            - study_material
+            - user
+            - vocabulary
+            - kana_vocabulary
+        url:
+          type: string
+        data_updated_at:
+          type: string
+          format: date-time
+        data:
+          type: object
+
+    ApiCollection:
+      type: object
+      properties:
+        object:
+          type: string
+          enum: [collection]
+        url:
+          type: string
+        data_updated_at:
+          type: string
+          format: date-time
+        data:
+          type: array
+          items:
+            type: object
+        pages:
+          type: object
+          properties:
+            next_url:
+              type: string
+              nullable: true
+            previous_url:
+              type: string
+              nullable: true
+            per_page:
+              type: integer
+        total_count:
+          type: integer
+
+    # =========================================================================
+    # User
+    # =========================================================================
+    ApiSubscription:
+      type: object
+      properties:
+        active:
+          type: boolean
+          description: Whether the user currently has a paid subscription
+        max_level_granted:
+          type: integer
+          description: The maximum level of content accessible to the user
+        type:
+          type: string
+          enum:
+            - free
+            - recurring
+            - lifetime
+            - unknown
+          description: The type of subscription the user has
+        period_ends_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: The date when the user's subscription period ends
+
+    ApiUserInner:
+      type: object
+      properties:
+        id:
+          type: string
+        level:
+          type: integer
+        username:
+          type: string
+        started_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: The signup date for the user
+        profile_url:
+          type: string
+          description: The URL to the user's public facing profile page
+        subscription:
+          $ref: "#/components/schemas/ApiSubscription"
+
+    ApiUser:
+      allOf:
+        - $ref: "#/components/schemas/ApiObject"
+        - type: object
+          properties:
+            object:
+              type: string
+              enum: [user]
+            data:
+              $ref: "#/components/schemas/ApiUserInner"
+
+    # =========================================================================
+    # Assignments
+    # =========================================================================
+    ApiAssignmentInner:
+      type: object
+      properties:
+        available_at:
+          type: string
+          format: date-time
+          nullable: true
+        burned_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        hidden:
+          type: boolean
+        passed_at:
+          type: string
+          format: date-time
+          nullable: true
+        resurrected_at:
+          type: string
+          format: date-time
+          nullable: true
+        srs_stage:
+          type: integer
+          description: SRS stage (0-9, where 0 is unlocked, 9 is burned)
+        started_at:
+          type: string
+          format: date-time
+          nullable: true
+        subject_id:
+          type: integer
+        subject_type:
+          type: string
+          enum:
+            - radical
+            - kanji
+            - vocabulary
+            - kana_vocabulary
+        unlocked_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    ApiAssignment:
+      allOf:
+        - $ref: "#/components/schemas/ApiObject"
+        - type: object
+          properties:
+            id:
+              type: integer
+            object:
+              type: string
+              enum: [assignment]
+            data:
+              $ref: "#/components/schemas/ApiAssignmentInner"
+
+    ApiAssignmentCollection:
+      allOf:
+        - $ref: "#/components/schemas/ApiCollection"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApiAssignment"
+
+    # =========================================================================
+    # Reviews
+    # =========================================================================
+    ApiReviewInner:
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        assignment_id:
+          type: integer
+        spaced_repetition_system_id:
+          type: integer
+        subject_id:
+          type: integer
+        starting_srs_stage:
+          type: integer
+        ending_srs_stage:
+          type: integer
+        incorrect_meaning_answers:
+          type: integer
+        incorrect_reading_answers:
+          type: integer
+
+    ApiReview:
+      allOf:
+        - $ref: "#/components/schemas/ApiObject"
+        - type: object
+          properties:
+            id:
+              type: integer
+            object:
+              type: string
+              enum: [review]
+            data:
+              $ref: "#/components/schemas/ApiReviewInner"
+
+    ApiReviewCollection:
+      allOf:
+        - $ref: "#/components/schemas/ApiCollection"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApiReview"
+
+    ApiReviewStatisticInner:
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        hidden:
+          type: boolean
+        meaning_correct:
+          type: integer
+        meaning_current_streak:
+          type: integer
+        meaning_incorrect:
+          type: integer
+        meaning_max_streak:
+          type: integer
+        reading_correct:
+          type: integer
+        reading_current_streak:
+          type: integer
+        reading_incorrect:
+          type: integer
+        reading_max_streak:
+          type: integer
+        percentage_correct:
+          type: number
+          description: |
+            Percentage correct can be calculated by rounding the result of
+            ((meaning_correct + reading_correct) / (meaning_correct + reading_correct +
+            meaning_incorrect + reading_incorrect)) * 100
+        subject_id:
+          type: integer
+        subject_type:
+          type: string
+          enum:
+            - radical
+            - kanji
+            - vocabulary
+            - kana_vocabulary
+
+    ApiReviewStatistic:
+      allOf:
+        - $ref: "#/components/schemas/ApiObject"
+        - type: object
+          properties:
+            id:
+              type: integer
+            object:
+              type: string
+              enum: [review_statistic]
+            data:
+              $ref: "#/components/schemas/ApiReviewStatisticInner"
+
+    ApiReviewStatisticCollection:
+      allOf:
+        - $ref: "#/components/schemas/ApiCollection"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApiReviewStatistic"
+
+    ApiCreateReviewResponse:
+      allOf:
+        - $ref: "#/components/schemas/ApiReview"
+        - type: object
+          properties:
+            resources_updated:
+              type: object
+              properties:
+                assignment:
+                  $ref: "#/components/schemas/ApiAssignment"
+                review_statistic:
+                  $ref: "#/components/schemas/ApiReviewStatistic"
+
+    # =========================================================================
+    # Study Materials
+    # =========================================================================
+    ApiStudyMaterialInner:
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        hidden:
+          type: boolean
+        meaning_note:
+          type: string
+          nullable: true
+        meaning_synonyms:
+          type: array
+          items:
+            type: string
+        reading_note:
+          type: string
+          nullable: true
+        subject_id:
+          type: integer
+        subject_type:
+          type: string
+          enum:
+            - radical
+            - kanji
+            - vocabulary
+            - kana_vocabulary
+
+    ApiStudyMaterial:
+      allOf:
+        - $ref: "#/components/schemas/ApiObject"
+        - type: object
+          properties:
+            id:
+              type: integer
+            object:
+              type: string
+              enum: [study_material]
+            data:
+              $ref: "#/components/schemas/ApiStudyMaterialInner"
+
+    ApiStudyMaterialCollection:
+      allOf:
+        - $ref: "#/components/schemas/ApiCollection"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApiStudyMaterial"
+
+    # =========================================================================
+    # Level Progressions
+    # =========================================================================
+    ApiLevelProgressionInner:
+      type: object
+      properties:
+        level:
+          type: integer
+          description: The level of the progression, with possible values from 1 to 60
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the level progression is created
+        unlocked_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the user can access lessons and reviews for the level
+        started_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the user starts their first lesson
+        passed_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the user passes at least 90% of kanji assignments
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the user burns 100% of assignments
+        abandoned_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the user abandons the level
+
+    ApiLevelProgression:
+      allOf:
+        - $ref: "#/components/schemas/ApiObject"
+        - type: object
+          properties:
+            id:
+              type: integer
+            object:
+              type: string
+              enum: [level_progression]
+            data:
+              $ref: "#/components/schemas/ApiLevelProgressionInner"
+
+    ApiLevelProgressionCollection:
+      allOf:
+        - $ref: "#/components/schemas/ApiCollection"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApiLevelProgression"
+
+    # =========================================================================
+    # Resets
+    # =========================================================================
+    ApiResetInner:
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        original_level:
+          type: integer
+        target_level:
+          type: integer
+        confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    ApiReset:
+      allOf:
+        - $ref: "#/components/schemas/ApiObject"
+        - type: object
+          properties:
+            id:
+              type: integer
+            object:
+              type: string
+              enum: [reset]
+            data:
+              $ref: "#/components/schemas/ApiResetInner"
+
+    ApiResetCollection:
+      allOf:
+        - $ref: "#/components/schemas/ApiCollection"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApiReset"
+
+    # =========================================================================
+    # Subjects
+    # =========================================================================
+    ApiSubjectMeaning:
+      type: object
+      properties:
+        meaning:
+          type: string
+        primary:
+          type: boolean
+        accepted_answer:
+          type: boolean
+
+    ApiSubjectAuxiliaryMeaning:
+      type: object
+      properties:
+        meaning:
+          type: string
+        type:
+          type: string
+          enum:
+            - whitelist
+            - blacklist
+
+    ApiSubjectBase:
+      type: object
+      properties:
+        auxiliary_meanings:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApiSubjectAuxiliaryMeaning"
+        characters:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        document_url:
+          type: string
+        hidden_at:
+          type: string
+          format: date-time
+          nullable: true
+        lesson_position:
+          type: integer
+        level:
+          type: integer
+        meaning_mnemonic:
+          type: string
+        meanings:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApiSubjectMeaning"
+        slug:
+          type: string
+        spaced_repetition_system_id:
+          type: integer
+
+    # Radical
+    ApiCharacterImageBase:
+      type: object
+      properties:
+        url:
+          type: string
+        content_type:
+          type: string
+          enum:
+            - image/png
+            - image/svg+xml
+
+    ApiCharacterImageSvg:
+      allOf:
+        - $ref: "#/components/schemas/ApiCharacterImageBase"
+        - type: object
+          properties:
+            content_type:
+              type: string
+              enum: [image/svg+xml]
+            metadata:
+              type: object
+              properties:
+                inline_styles:
+                  type: boolean
+
+    ApiCharacterImagePng:
+      allOf:
+        - $ref: "#/components/schemas/ApiCharacterImageBase"
+        - type: object
+          properties:
+            content_type:
+              type: string
+              enum: [image/png]
+            metadata:
+              type: object
+              properties:
+                color:
+                  type: string
+                dimensions:
+                  type: string
+                style_name:
+                  type: string
+
+    ApiCharacterImage:
+      oneOf:
+        - $ref: "#/components/schemas/ApiCharacterImageSvg"
+        - $ref: "#/components/schemas/ApiCharacterImagePng"
+
+    ApiSubjectRadicalInner:
+      allOf:
+        - $ref: "#/components/schemas/ApiSubjectBase"
+        - type: object
+          properties:
+            amalgamation_subject_ids:
+              type: array
+              items:
+                type: integer
+            character_images:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApiCharacterImage"
+
+    ApiSubjectRadical:
+      allOf:
+        - $ref: "#/components/schemas/ApiObject"
+        - type: object
+          properties:
+            id:
+              type: integer
+            object:
+              type: string
+              enum: [radical]
+            data:
+              $ref: "#/components/schemas/ApiSubjectRadicalInner"
+
+    # Kanji
+    ApiSubjectReadingBase:
+      type: object
+      properties:
+        reading:
+          type: string
+        primary:
+          type: boolean
+        accepted_answer:
+          type: boolean
+
+    ApiSubjectKanjiReading:
+      allOf:
+        - $ref: "#/components/schemas/ApiSubjectReadingBase"
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - kunyomi
+                - nanori
+                - onyomi
+
+    ApiSubjectKanjiInner:
+      allOf:
+        - $ref: "#/components/schemas/ApiSubjectBase"
+        - type: object
+          properties:
+            amalgamation_subject_ids:
+              type: array
+              items:
+                type: integer
+            component_subject_ids:
+              type: array
+              items:
+                type: integer
+            meaning_hint:
+              type: string
+              nullable: true
+            reading_hint:
+              type: string
+              nullable: true
+            reading_mnemonic:
+              type: string
+            readings:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApiSubjectKanjiReading"
+            visually_similar_subject_ids:
+              type: array
+              items:
+                type: integer
+
+    ApiSubjectKanji:
+      allOf:
+        - $ref: "#/components/schemas/ApiObject"
+        - type: object
+          properties:
+            id:
+              type: integer
+            object:
+              type: string
+              enum: [kanji]
+            data:
+              $ref: "#/components/schemas/ApiSubjectKanjiInner"
+
+    # Vocabulary
+    ApiSubjectContextSentence:
+      type: object
+      properties:
+        en:
+          type: string
+        ja:
+          type: string
+
+    ApiSubjectPronunciationAudio:
+      type: object
+      properties:
+        url:
+          type: string
+        content_type:
+          type: string
+        metadata:
+          type: object
+          properties:
+            gender:
+              type: string
+            source_id:
+              type: integer
+            pronunciation:
+              type: string
+            voice_actor_id:
+              type: integer
+            voice_actor_name:
+              type: string
+            voice_description:
+              type: string
+
+    ApiSubjectVocabularyInner:
+      allOf:
+        - $ref: "#/components/schemas/ApiSubjectBase"
+        - type: object
+          properties:
+            component_subject_ids:
+              type: array
+              items:
+                type: integer
+            context_sentences:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApiSubjectContextSentence"
+            meaning_mnemonic:
+              type: string
+            parts_of_speech:
+              type: array
+              items:
+                type: string
+            pronunciation_audios:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApiSubjectPronunciationAudio"
+            readings:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApiSubjectReadingBase"
+            reading_mnemonic:
+              type: string
+
+    ApiSubjectVocabulary:
+      allOf:
+        - $ref: "#/components/schemas/ApiObject"
+        - type: object
+          properties:
+            id:
+              type: integer
+            object:
+              type: string
+              enum: [vocabulary]
+            data:
+              $ref: "#/components/schemas/ApiSubjectVocabularyInner"
+
+    # Kana Vocabulary
+    ApiSubjectKanaVocabularyInner:
+      allOf:
+        - $ref: "#/components/schemas/ApiSubjectBase"
+        - type: object
+          properties:
+            context_sentences:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApiSubjectContextSentence"
+            meaning_mnemonic:
+              type: string
+            parts_of_speech:
+              type: array
+              items:
+                type: string
+            pronunciation_audios:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApiSubjectPronunciationAudio"
+
+    ApiSubjectKanaVocabulary:
+      allOf:
+        - $ref: "#/components/schemas/ApiObject"
+        - type: object
+          properties:
+            id:
+              type: integer
+            object:
+              type: string
+              enum: [kana_vocabulary]
+            data:
+              $ref: "#/components/schemas/ApiSubjectKanaVocabularyInner"
+
+    ApiSubject:
+      oneOf:
+        - $ref: "#/components/schemas/ApiSubjectRadical"
+        - $ref: "#/components/schemas/ApiSubjectKanji"
+        - $ref: "#/components/schemas/ApiSubjectVocabulary"
+        - $ref: "#/components/schemas/ApiSubjectKanaVocabulary"
+
+    ApiSubjectCollection:
+      allOf:
+        - $ref: "#/components/schemas/ApiCollection"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApiSubject"
+
+    # =========================================================================
+    # SRS (Spaced Repetition System)
+    # =========================================================================
+    ApiSrsStage:
+      type: object
+      properties:
+        interval:
+          type: integer
+          nullable: true
+          description: Length of time added to the time of review registration
+        interval_unit:
+          type: string
+          enum:
+            - milliseconds
+            - seconds
+            - minutes
+            - hours
+            - days
+            - weeks
+          nullable: true
+        position:
+          type: integer
+          description: Position of the stage within the continuous order
+
+    ApiSpacedRepetitionSystemInner:
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        name:
+          type: string
+        description:
+          type: string
+        unlocking_stage_position:
+          type: integer
+        starting_stage_position:
+          type: integer
+        passing_stage_position:
+          type: integer
+        burning_stage_position:
+          type: integer
+        stages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApiSrsStage"
+
+    ApiSpacedRepetitionSystem:
+      allOf:
+        - $ref: "#/components/schemas/ApiObject"
+        - type: object
+          properties:
+            id:
+              type: integer
+            object:
+              type: string
+              enum: [spaced_repetition_system]
+            data:
+              $ref: "#/components/schemas/ApiSpacedRepetitionSystemInner"
+
+    ApiSpacedRepetitionSystemCollection:
+      allOf:
+        - $ref: "#/components/schemas/ApiCollection"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/ApiSpacedRepetitionSystem"
+
+    # =========================================================================
+    # Summary (Report)
+    # =========================================================================
+    ApiSummarySubjects:
+      type: object
+      properties:
+        available_at:
+          type: string
+          format: date-time
+        subject_ids:
+          type: array
+          items:
+            type: integer
+
+    ApiSummaryInner:
+      type: object
+      properties:
+        lessons:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApiSummarySubjects"
+        next_reviews_at:
+          type: string
+          format: date-time
+          nullable: true
+        reviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApiSummarySubjects"
+
+    ApiSummary:
+      allOf:
+        - $ref: "#/components/schemas/ApiObject"
+        - type: object
+          properties:
+            object:
+              type: string
+              enum: [report]
+            data:
+              $ref: "#/components/schemas/ApiSummaryInner"
