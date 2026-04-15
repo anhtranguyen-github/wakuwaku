@@ -1,0 +1,16 @@
+[project]
+name = "hanachan-hanachan-hanachan-wanikani-api"
+version = "0.1.0"
+description = "Hanachan Hanachan WaniKani API clone built with FastAPI and PostgreSQL"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.111.0",
+    "uvicorn[standard]>=0.30.0",
+    "psycopg2-binary>=2.9.0",
+    "pydantic-settings>=2.0.0",
+    "pydantic[email]>=2.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
