@@ -1,0 +1,47 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# uv
+.uv/
+
+# Environment
+.env
+.env.example
+
+# Tools/IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project specific
+README.md
+CLAUDE.md
+EXAMPLES.md
+docs/
+tests/
+test_*.py
+test_*.sh
+hanachan-hanachan-wanikani-api-merged.yaml
+schema.sql
