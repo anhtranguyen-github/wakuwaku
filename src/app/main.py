@@ -23,6 +23,6 @@ async def health_check():
 
 @app.get("/", tags=["Root"])
 async def root():
-    return {"message": "Hanachan Hanachan Hanachan WaniKani API v2", "version": settings.VERSION}
+    return {"message": "Hanachan WaniKani API v2", "version": settings.VERSION}
 
 app.include_router(api_router, prefix=settings.API_V1_STR)

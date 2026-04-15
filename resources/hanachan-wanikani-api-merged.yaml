@@ -1100,7 +1100,9 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          oneOf:
+            - type: integer
+            - type: string
           nullable: true
         object:
           type: string
@@ -1294,11 +1296,17 @@ components:
           type: string
           format: date-time
         assignment_id:
-          type: integer
+          oneOf:
+            - type: integer
+            - type: string
         spaced_repetition_system_id:
-          type: integer
+          oneOf:
+            - type: integer
+            - type: string
         subject_id:
-          type: integer
+          oneOf:
+            - type: integer
+            - type: string
         starting_srs_stage:
           type: integer
         ending_srs_stage:

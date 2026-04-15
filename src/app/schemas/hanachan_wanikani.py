@@ -1,6 +1,10 @@
 from datetime import datetime
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Union
 from pydantic import BaseModel
+
+
+# WaniKani ID Type: Supports legacy integers and Supabase UUIDs
+WKID = Union[int, str]
 
 
 class SubjectType(str):
@@ -11,7 +15,7 @@ class SubjectType(str):
 
 
 class ApiObject(BaseModel):
-    id: Optional[int] = None
+    id: Optional[WKID] = None
     object: str
     url: str
     data_updated_at: Optional[datetime] = None
@@ -44,7 +48,7 @@ class ApiUserInner(BaseModel):
 
 
 class ApiUser(BaseModel):
-    id: Optional[int] = None
+    id: Optional[WKID] = None
     object: str = "user"
     url: str
     data_updated_at: Optional[datetime] = None
@@ -54,19 +58,19 @@ class ApiUser(BaseModel):
 class ApiAssignmentInner(BaseModel):
     available_at: Optional[datetime] = None
     burned_at: Optional[datetime] = None
-    created_at: datetime
-    hidden: bool
+    created_at: Optional[datetime] = None
+    hidden: bool = False
     passed_at: Optional[datetime] = None
     resurrected_at: Optional[datetime] = None
-    srs_stage: int
+    srs_stage: int = 0
     started_at: Optional[datetime] = None
-    subject_id: int
-    subject_type: str
+    subject_id: WKID
+    subject_type: Optional[str] = None
     unlocked_at: Optional[datetime] = None
 
 
 class ApiAssignment(BaseModel):
-    id: Optional[int] = None
+    id: Optional[WKID] = None
     object: str = "assignment"
     url: str
     data_updated_at: Optional[datetime] = None
@@ -83,18 +87,18 @@ class ApiAssignmentCollection(BaseModel):
 
 
 class ApiReviewInner(BaseModel):
-    created_at: datetime
-    assignment_id: int
-    spaced_repetition_system_id: int
-    subject_id: int
-    starting_srs_stage: int
-    ending_srs_stage: int
-    incorrect_meaning_answers: int
-    incorrect_reading_answers: int
+    created_at: Optional[datetime] = None
+    assignment_id: WKID
+    spaced_repetition_system_id: WKID = 1
+    subject_id: WKID = 0
+    starting_srs_stage: int = 0
+    ending_srs_stage: int = 0
+    incorrect_meaning_answers: int = 0
+    incorrect_reading_answers: int = 0
 
 
 class ApiReview(BaseModel):
-    id: Optional[int] = None
+    id: Optional[WKID] = None
     object: str = "review"
     url: str
     data_updated_at: Optional[datetime] = None
@@ -111,23 +115,23 @@ class ApiReviewCollection(BaseModel):
 
 
 class ApiReviewStatisticInner(BaseModel):
-    created_at: datetime
-    hidden: bool
-    meaning_correct: int
-    meaning_current_streak: int
-    meaning_incorrect: int
-    meaning_max_streak: int
-    reading_correct: int
-    reading_current_streak: int
-    reading_incorrect: int
-    reading_max_streak: int
-    percentage_correct: float
-    subject_id: int
-    subject_type: str
+    created_at: Optional[datetime] = None
+    hidden: bool = False
+    meaning_correct: int = 0
+    meaning_current_streak: int = 0
+    meaning_incorrect: int = 0
+    meaning_max_streak: int = 0
+    reading_correct: int = 0
+    reading_current_streak: int = 0
+    reading_incorrect: int = 0
+    reading_max_streak: int = 0
+    percentage_correct: float = 0.0
+    subject_id: WKID = 0
+    subject_type: str = "vocabulary"
 
 
 class ApiReviewStatistic(BaseModel):
-    id: Optional[int] = None
+    id: Optional[WKID] = None
     object: str = "review_statistic"
     url: str
     data_updated_at: Optional[datetime] = None
@@ -144,17 +148,17 @@ class ApiReviewStatisticCollection(BaseModel):
 
 
 class ApiStudyMaterialInner(BaseModel):
-    created_at: datetime
-    hidden: bool
+    created_at: Optional[datetime] = None
+    hidden: bool = False
     meaning_note: Optional[str] = None
     meaning_synonyms: List[str] = []
     reading_note: Optional[str] = None
-    subject_id: int
-    subject_type: str
+    subject_id: WKID = 0
+    subject_type: str = "vocabulary"
 
 
 class ApiStudyMaterial(BaseModel):
-    id: Optional[int] = None
+    id: Optional[WKID] = None
     object: str = "study_material"
     url: str
     data_updated_at: Optional[datetime] = None
@@ -171,8 +175,8 @@ class ApiStudyMaterialCollection(BaseModel):
 
 
 class ApiLevelProgressionInner(BaseModel):
-    level: int
-    created_at: datetime
+    level: int = 1
+    created_at: Optional[datetime] = None
     unlocked_at: Optional[datetime] = None
     started_at: Optional[datetime] = None
     passed_at: Optional[datetime] = None
@@ -181,7 +185,7 @@ class ApiLevelProgressionInner(BaseModel):
 
 
 class ApiLevelProgression(BaseModel):
-    id: Optional[int] = None
+    id: Optional[WKID] = None
     object: str = "level_progression"
     url: str
     data_updated_at: Optional[datetime] = None
@@ -198,14 +202,14 @@ class ApiLevelProgressionCollection(BaseModel):
 
 
 class ApiResetInner(BaseModel):
-    created_at: datetime
-    original_level: int
-    target_level: int
+    created_at: Optional[datetime] = None
+    original_level: int = 1
+    target_level: int = 1
     confirmed_at: Optional[datetime] = None
 
 
 class ApiReset(BaseModel):
-    id: Optional[int] = None
+    id: Optional[WKID] = None
     object: str = "reset"
     url: str
     data_updated_at: Optional[datetime] = None
@@ -235,15 +239,15 @@ class ApiSubjectAuxiliaryMeaning(BaseModel):
 class ApiSubjectBase(BaseModel):
     auxiliary_meanings: List[dict] = []
     characters: Optional[str] = None
-    created_at: datetime
-    document_url: str
+    created_at: Optional[datetime] = None
+    document_url: Optional[str] = ""
     hidden_at: Optional[datetime] = None
-    lesson_position: int
-    level: int
-    meaning_mnemonic: str
-    meanings: List[ApiSubjectMeaning]
-    slug: str
-    spaced_repetition_system_id: int
+    lesson_position: int = 0
+    level: int = 1
+    meaning_mnemonic: Optional[str] = ""
+    meanings: List[ApiSubjectMeaning] = []
+    slug: Optional[str] = ""
+    spaced_repetition_system_id: WKID = 1
 
 
 class ApiCharacterImageBase(BaseModel):
@@ -258,23 +262,23 @@ class ApiCharacterImage(BaseModel):
 
 
 class ApiSubjectRadicalInner(BaseModel):
-    amalgamation_subject_ids: List[int] = []
+    amalgamation_subject_ids: List[WKID] = []
     character_images: List[dict] = []
     auxiliary_meanings: List[dict] = []
     characters: Optional[str] = None
-    created_at: datetime
-    document_url: str
+    created_at: Optional[datetime] = None
+    document_url: Optional[str] = ""
     hidden_at: Optional[datetime] = None
-    lesson_position: int
-    level: int
-    meaning_mnemonic: str
-    meanings: List[ApiSubjectMeaning]
-    slug: str
-    spaced_repetition_system_id: int
+    lesson_position: int = 0
+    level: int = 1
+    meaning_mnemonic: Optional[str] = ""
+    meanings: List[ApiSubjectMeaning] = []
+    slug: Optional[str] = ""
+    spaced_repetition_system_id: WKID = 1
 
 
 class ApiSubjectRadical(BaseModel):
-    id: Optional[int] = None
+    id: Optional[WKID] = None
     object: str = "radical"
     url: str
     data_updated_at: Optional[datetime] = None
@@ -289,28 +293,28 @@ class ApiSubjectReading(BaseModel):
 
 
 class ApiSubjectKanjiInner(BaseModel):
-    amalgamation_subject_ids: List[int] = []
-    component_subject_ids: List[int] = []
+    amalgamation_subject_ids: List[WKID] = []
+    component_subject_ids: List[WKID] = []
     meaning_hint: Optional[str] = None
     reading_hint: Optional[str] = None
-    reading_mnemonic: str
+    reading_mnemonic: Optional[str] = ""
     readings: List[ApiSubjectReading] = []
-    visually_similar_subject_ids: List[int] = []
+    visually_similar_subject_ids: List[WKID] = []
     auxiliary_meanings: List[dict] = []
     characters: Optional[str] = None
-    created_at: datetime
-    document_url: str
+    created_at: Optional[datetime] = None
+    document_url: Optional[str] = ""
     hidden_at: Optional[datetime] = None
-    lesson_position: int
-    level: int
-    meaning_mnemonic: str
-    meanings: List[ApiSubjectMeaning]
-    slug: str
-    spaced_repetition_system_id: int
+    lesson_position: int = 0
+    level: int = 1
+    meaning_mnemonic: Optional[str] = ""
+    meanings: List[ApiSubjectMeaning] = []
+    slug: Optional[str] = ""
+    spaced_repetition_system_id: WKID = 1
 
 
 class ApiSubjectKanji(BaseModel):
-    id: Optional[int] = None
+    id: Optional[WKID] = None
     object: str = "kanji"
     url: str
     data_updated_at: Optional[datetime] = None
@@ -329,27 +333,27 @@ class ApiSubjectPronunciationAudio(BaseModel):
 
 
 class ApiSubjectVocabularyInner(BaseModel):
-    component_subject_ids: List[int] = []
+    component_subject_ids: List[WKID] = []
     context_sentences: List[dict] = []
-    meaning_mnemonic: str
+    meaning_mnemonic: Optional[str] = ""
     parts_of_speech: List[str] = []
     pronunciation_audios: List[dict] = []
     readings: List[ApiSubjectReading] = []
-    reading_mnemonic: str
+    reading_mnemonic: Optional[str] = ""
     auxiliary_meanings: List[dict] = []
     characters: Optional[str] = None
-    created_at: datetime
-    document_url: str
+    created_at: Optional[datetime] = None
+    document_url: Optional[str] = ""
     hidden_at: Optional[datetime] = None
-    lesson_position: int
-    level: int
-    meanings: List[ApiSubjectMeaning]
-    slug: str
-    spaced_repetition_system_id: int
+    lesson_position: int = 0
+    level: int = 1
+    meanings: List[ApiSubjectMeaning] = []
+    slug: Optional[str] = ""
+    spaced_repetition_system_id: WKID = 1
 
 
 class ApiSubjectVocabulary(BaseModel):
-    id: Optional[int] = None
+    id: Optional[WKID] = None
     object: str = "vocabulary"
     url: str
     data_updated_at: Optional[datetime] = None
@@ -358,23 +362,23 @@ class ApiSubjectVocabulary(BaseModel):
 
 class ApiSubjectKanaVocabularyInner(BaseModel):
     context_sentences: List[dict] = []
-    meaning_mnemonic: str
+    meaning_mnemonic: Optional[str] = ""
     parts_of_speech: List[str] = []
     pronunciation_audios: List[dict] = []
     auxiliary_meanings: List[dict] = []
     characters: Optional[str] = None
-    created_at: datetime
-    document_url: str
+    created_at: Optional[datetime] = None
+    document_url: Optional[str] = ""
     hidden_at: Optional[datetime] = None
-    lesson_position: int
-    level: int
-    meanings: List[ApiSubjectMeaning]
-    slug: str
-    spaced_repetition_system_id: int
+    lesson_position: int = 0
+    level: int = 1
+    meanings: List[ApiSubjectMeaning] = []
+    slug: Optional[str] = ""
+    spaced_repetition_system_id: WKID = 1
 
 
 class ApiSubjectKanaVocabulary(BaseModel):
-    id: Optional[int] = None
+    id: Optional[WKID] = None
     object: str = "kana_vocabulary"
     url: str
     data_updated_at: Optional[datetime] = None
@@ -397,18 +401,18 @@ class ApiSrsStage(BaseModel):
 
 
 class ApiSpacedRepetitionSystemInner(BaseModel):
-    created_at: datetime
-    name: str
-    description: str
-    unlocking_stage_position: int
-    starting_stage_position: int
-    passing_stage_position: int
-    burning_stage_position: int
+    created_at: Optional[datetime] = None
+    name: str = ""
+    description: str = ""
+    unlocking_stage_position: int = 0
+    starting_stage_position: int = 1
+    passing_stage_position: int = 5
+    burning_stage_position: int = 9
     stages: List[ApiSrsStage] = []
 
 
 class ApiSpacedRepetitionSystem(BaseModel):
-    id: Optional[int] = None
+    id: Optional[WKID] = None
     object: str = "spaced_repetition_system"
     url: str
     data_updated_at: Optional[datetime] = None
@@ -425,8 +429,8 @@ class ApiSpacedRepetitionSystemCollection(BaseModel):
 
 
 class ApiSummarySubjects(BaseModel):
-    available_at: datetime
-    subject_ids: List[int] = []
+    available_at: Optional[datetime] = None
+    subject_ids: List[WKID] = []
 
 
 class ApiSummaryInner(BaseModel):
@@ -436,7 +440,7 @@ class ApiSummaryInner(BaseModel):
 
 
 class ApiSummary(BaseModel):
-    id: Optional[int] = None
+    id: Optional[WKID] = None
     object: str = "report"
     url: str
     data_updated_at: Optional[datetime] = None
@@ -444,7 +448,7 @@ class ApiSummary(BaseModel):
 
 
 class ApiCreateReviewResponse(BaseModel):
-    id: Optional[int] = None
+    id: Optional[WKID] = None
     object: str = "review"
     url: str
     data_updated_at: Optional[datetime] = None
@@ -453,7 +457,7 @@ class ApiCreateReviewResponse(BaseModel):
 
 
 class ReviewCreateInner(BaseModel):
-    assignment_id: int
+    assignment_id: WKID
     incorrect_meaning_answers: int
     incorrect_reading_answers: int
     created_at: Optional[datetime] = None
@@ -464,7 +468,7 @@ class ReviewCreate(BaseModel):
 
 
 class StudyMaterialCreateInner(BaseModel):
-    subject_id: int
+    subject_id: WKID
     meaning_note: Optional[str] = None
     reading_note: Optional[str] = None
     meaning_synonyms: List[str] = []

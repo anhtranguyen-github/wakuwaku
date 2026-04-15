@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import Optional, List
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Header
-
+from jose import jwt, JWTError
+from app.core.config import settings
 from app.services.hanachan_service import HanachanService
 from app.schemas.hanachan_wanikani import (
     AssignmentStart,
@@ -14,19 +15,34 @@ router = APIRouter()
 
 
 def get_user_id_from_token(authorization: Optional[str] = Header(None)) -> str:
-    """Extract user ID from authorization header (for local dev, accepts any token with user ID)"""
+    """Validate JWT and extract user ID from Supabase authorization header"""
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
+            detail="Missing or invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    # For local development, accept any token and use test user
-    # In production, validate JWT and extract user ID
+    
     token = authorization.replace("Bearer ", "")
-    if token == "test" or token == "test_token_123":
-        return "550e8400-e29b-41d4-a716-446655440000"  # Test user
-    return token  # Use token as user ID for simplicity in local dev
+    try:
+        payload = jwt.decode(
+            token, 
+            settings.SUPABASE_JWT_SECRET, 
+            algorithms=["HS256"],
+            options={"verify_aud": False} # Supabase uses different audience sometimes
+        )
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token missing user identification",
+            )
+        return user_id
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+        )
 
 
 def get_service(user_id: str = Depends(get_user_id_from_token)) -> HanachanService:
@@ -397,3 +413,31 @@ async def get_subject(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+# =============================================================================
+# Sync – replaces the crawl-wanikani Edge Function
+# =============================================================================
+from pydantic import BaseModel as PydanticBaseModel
+
+class SyncRequest(PydanticBaseModel):
+    api_key: str
+    type: Optional[str] = None
+
+
+@router.post("/sync")
+async def sync_wanikani(
+    body: SyncRequest,
+    service: HanachanService = Depends(get_service),
+):
+    """
+    Sync subjects, assignments, and review statistics from WaniKani.
+    Replaces the crawl-wanikani Supabase Edge Function.
+    """
+    try:
+        return await service.sync_wanikani(
+            api_key=body.api_key,
+            subject_type=body.type,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

@@ -71,3 +71,8 @@ dmypy.json
 
 .skills/
 .venv/
+# Scratch and Debug
+scratch/
+scripts/
+*.log
+*.pid
