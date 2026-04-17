@@ -7,10 +7,15 @@ if [ ! -d "$DIST_DIR" ]; then
   exit 1
 fi
 
-echo "Patching KanjiSchool dist files to point to local Hanachan API..."
+echo "Patching KanjiSchool dist files to point to local Hanachan API (using absolute origin)..."
 
 # Find all .js and .css files in dist/assets
-# Replace 'https://api.wanikani.com/v2' with '/v2' (handled by frontend server proxy)
+# Replace 'https://api.wanikani.com/v2' (quoted) with JS expression window.location.origin + "/v2"
+# We handle both double and single quotes
+find "$DIST_DIR" -type f \( -name "*.js" -o -name "*.css" -o -name "*.html" \) -exec sed -i 's|"https://api.wanikani.com/v2"|(window.location.origin+"/v2")|g' {} +
+find "$DIST_DIR" -type f \( -name "*.js" -o -name "*.css" -o -name "*.html" \) -exec sed -i "s|'https://api.wanikani.com/v2'|(window.location.origin+'/v2')|g" {} +
+
+# Fail-safe for any remaining unquoted occurrences (though unlikely to be problematic for URL constructor)
 find "$DIST_DIR" -type f \( -name "*.js" -o -name "*.css" -o -name "*.html" \) -exec sed -i "s|https://api.wanikani.com/v2|/v2|g" {} +
 
-echo "Patching complete. API calls now directed to relative /v2 (proxied to port 7000)"
+echo "Patching complete. URL constructor issue resolved by using absolute location.origin."
