@@ -1,4 +1,59 @@
+version: '3.8'
+
 services:
+  # --- Database ---
+  db:
+    image: supabase/postgres:15.1.1.78
+    container_name: hanachan-db
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    ports:
+      - "7432:5432"
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./resources/schema.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./supabase/db/data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # --- Supabase Components ---
+  auth:
+    image: supabase/gotrue:v2.132.3
+    container_name: hanachan-auth
+    ports:
+      - "7300:9999"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - GOTRUE_DB_DRIVER=postgres
+      - GOTRUE_DB_DATABASE_URL=postgres://postgres:postgres@db:5432/postgres?sslmode=disable
+      - GOTRUE_SITE_URL=http://localhost:7100
+      - GOTRUE_JWT_SECRET=${SUPABASE_JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+      - GOTRUE_JWT_EXP=3600
+      - GOTRUE_EXTERNAL_EMAIL_ENABLED=true
+      - GOTRUE_MAILER_AUTOCONFIRM=true
+
+  rest:
+    image: postgrest/postgrest:v12.0.1
+    container_name: hanachan-rest
+    ports:
+      - "7500:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - PGRST_DB_URI=postgres://postgres:postgres@db:5432/postgres
+      - PGRST_DB_SCHEMA=public
+      - PGRST_DB_ANON_ROLE=anon
+      - PGRST_JWT_SECRET=${SUPABASE_JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+
+  # --- Hanachan Backend ---
   backend:
     build:
       context: ./hanachan-fastapi
@@ -8,9 +63,10 @@ services:
     ports:
       - "7000:8000"
     volumes:
-      - ./hanachan-fastapi/src:/app/src
+        - ./hanachan-fastapi/src:/app/src
     environment:
-      - SUPABASE_URL=${SUPABASE_URL}
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+      - SUPABASE_URL=http://rest:3000
       - SUPABASE_KEY=${SUPABASE_KEY}
       - SUPABASE_JWT_SECRET=${SUPABASE_JWT_SECRET}
       - APP_BASE_URL=${APP_BASE_URL:-http://localhost:7000}
@@ -18,9 +74,35 @@ services:
       - PROJECT_NAME=Hanachan WaniKani
       - VERSION=20170710
       - PYTHONPATH=/app/src
+    depends_on:
+      db:
+        condition: service_healthy
     env_file:
       - .env
 
+  # --- Seeder (Uses backend image to run Python import) ---
+  seeder:
+    build:
+      context: ./hanachan-fastapi
+      dockerfile: Dockerfile
+    container_name: hanachan-seeder
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./scripts:/app/scripts
+      - ./resources/data:/app/resources/data
+    working_dir: /app
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    # The .venv is already in /app/.venv from the Dockerfile
+    command: >
+      sh -c "sleep 5 && python scripts/seed_supabase.py"
+
+  # --- Frontend ---
   nginx:
     image: nginx:alpine
     container_name: hanachan-nginx
@@ -32,3 +114,7 @@ services:
       - ./kanjischool/dist:/usr/share/nginx/html:ro
     depends_on:
       - backend
+
+networks:
+  default:
+    name: hanachan-network
