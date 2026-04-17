@@ -1,17 +1,16 @@
 # Build stage
-FROM node:20-alpine AS build
+FROM oven/bun:alpine AS build
 
 RUN apk update && apk add git
 
 WORKDIR /build
 
-COPY package.json yarn.lock .yarnrc.yml ./
-COPY .yarn ./.yarn
-RUN yarn install --immutable
+COPY package.json bun.lockb ./
+RUN bun install --frozen-lockfile
 
 COPY . .
 ENV NODE_ENV=production
-RUN yarn run build
+RUN bun run build
 
 # Copy the build files to the output folder (ideally volumed in) to be consumed by the webserver
 FROM busybox

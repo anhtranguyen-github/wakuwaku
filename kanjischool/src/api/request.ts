@@ -29,7 +29,7 @@ interface RequestConfig extends RequestInit {
   timeout?: number;
 }
 
-const API_BASE = "https://api.wanikani.com/v2";
+const API_BASE = import.meta.env.VITE_API_BASE || "/v2";
 const MAX_ATTEMPTS = 10;
 const DEFAULT_TIMEOUT = 30000;
 
@@ -38,7 +38,12 @@ let rateLimitResetTime: Dayjs | null = null;
 let rateLimitResetTimeout: NodeJS.Timeout | number | null = null;
 
 export function getRequestUrl(url: string): string {
-  const urlO = new URL(url, API_BASE);
+  // If API_BASE is relative, make it absolute using window.location.origin
+  const absoluteBase = API_BASE.startsWith("http") 
+    ? API_BASE 
+    : new URL(API_BASE, window.location.origin).toString();
+    
+  const urlO = new URL(url, absoluteBase);
 
   // Prepend /v2/ to the path if necessary
   if (!urlO.pathname.startsWith("/v2")) {

@@ -3,13 +3,14 @@
 // Full details: https://github.com/Lemmmy/KanjiSchool/blob/master/LICENSE
 
 import { useState } from "react";
-import { Form, Input, Button, Row, Col, Divider } from "antd";
+import { Form, Input, Button, Row, Col, Divider, Tabs } from "antd";
 import useBreakpoint from "antd/es/grid/hooks/useBreakpoint";
 
 import { AppLoading } from "@global/AppLoading";
 import { PageLayout } from "@layout/PageLayout";
 
 import * as api from "@api";
+import { loginStandaloneAccount, registerStandaloneAccount } from "@api";
 
 import { SimpleCard } from "@comp/SimpleCard.tsx";
 import { ExtLink } from "@comp/ExtLink";
@@ -42,6 +43,17 @@ export function LoginPage(): JSX.Element {
     } catch (err: any) {
       console.error("login failed:", err);
       setLoginFailed(true);
+    } finally {
+      setLoggingIn(false);
+    }
+  }
+
+  async function onRegisterStandalone() {
+    try {
+      setLoggingIn(true);
+      await api.registerStandaloneAccount();
+    } catch (err) {
+      console.error("standalone registration failed:", err);
     } finally {
       setLoggingIn(false);
     }
@@ -84,78 +96,111 @@ export function LoginPage(): JSX.Element {
 
       <Divider />
 
-      {/* Onboarding */}
-      <p className="text-justify">
-        To get started, enter your <ExtLink href="https://www.wanikani.com/settings/personal_access_tokens">WaniKani
-        API v2 key</ExtLink>.
-        Permissions required:
-      </p>
+      <Tabs
+        defaultActiveKey="wanikani"
+        items={[
+          {
+            key: "wanikani",
+            label: "WaniKani API",
+            children: (
+              <>
+                <p className="text-justify">
+                  To get started with your existing WaniKani data, enter your <ExtLink href="https://www.wanikani.com/settings/personal_access_tokens">WaniKani
+                  API v2 key</ExtLink>.
+                </p>
 
-      <ul className="mt-0 grid grid-cols-1 md:grid-cols-2 gap-0.5 md:gap-xs">
-        <li><code>assignments:start</code></li>
-        <li><code>reviews:create</code></li>
-        <li><code>study_materials:create</code></li>
-        <li><code>study_materials:update</code></li>
-      </ul>
+                <Form
+                  form={form}
+                  layout="vertical"
+                  initialValues={{ apiKey: "" }}
+                  onFinish={onSubmit}
+                  className="w-full"
+                >
+                  <Form.Item
+                    name="apiKey"
+                    label="API Key"
+                    required
+                    rules={[{
+                      pattern: UUID_RE,
+                      message: "Must be a valid API key"
+                    }]}
+                    validateStatus={loginFailed ? "error" : undefined}
+                    help={loginFailed ? "Login failed, incorrect API key?" : undefined}
+                  >
+                    <Input
+                      type="password"
+                      placeholder="API Key"
+                      autoComplete="current-password"
+                    />
+                  </Form.Item>
 
-      <p className="text-desc text-justify">
-        If you don&apos;t have a WaniKani account yet, create
-        one <ExtLink href="https://www.wanikani.com">here</ExtLink>.
-      </p>
-
-      <Form
-        form={form}
-        layout="inline"
-        initialValues={{ apiKey: "" }}
-        onFinish={onSubmit}
-        className="w-full"
-      >
-        {/* Fake username for autofill */}
-        <Input
-          type="username"
-          id="username"
-          name="username"
-          autoComplete="username"
-          value="WaniKani API Key"
-          className="absolute pointer-events-none opacity-0"
-        />
-
-        {/* API key */}
-        <Form.Item
-          name="apiKey"
-          label="API Key"
-          required
-          rules={[{
-            pattern: UUID_RE,
-            message: "Must be a valid API key"
-          }]}
-
-          // Show an error if the login failed
-          validateStatus={loginFailed ? "error" : undefined}
-          help={loginFailed
-            ? "Login failed, incorrect API key?"
-            : undefined}
-
-          className="!flex-1 !mie-0 md:!mie-md basis-full md:basis-auto
-            [&_.ant-form-item-label]:hidden md:[&_.ant-form-item-label]:block"
-        >
-          <Input
-            type="password"
-            name="apiKey"
-            placeholder="API Key"
-            autoComplete="current-password"
-          />
-        </Form.Item>
-
-        {/* Submit button */}
-        <Button
-          type="primary"
-          onClick={onSubmit}
-          className="basis-full mt-sm md:basis-auto md:mt-0"
-        >
-          Log in
-        </Button>
-      </Form>
+                  <Button
+                    type="primary"
+                    onClick={onSubmit}
+                    size="large"
+                    block
+                  >
+                    Log in with WaniKani
+                  </Button>
+                </Form>
+              </>
+            )
+          },
+          {
+            key: "login",
+            label: "Standalone Login",
+            children: (
+              <>
+                <p className="text-justify mb-sm">
+                  Log in to your <strong>standalone</strong> Hanachan account.
+                </p>
+                <Form
+                  layout="vertical"
+                  onFinish={(v) => loginStandaloneAccount(v.email, v.password).catch(() => setLoginFailed(true))}
+                >
+                  <Form.Item name="email" label="Email" required rules={[{ type: 'email' }]}>
+                    <Input placeholder="Email" />
+                  </Form.Item>
+                  <Form.Item name="password" label="Password" required>
+                    <Input.Password placeholder="Password" />
+                  </Form.Item>
+                  <Button type="primary" htmlType="submit" size="large" block>
+                    Log In
+                  </Button>
+                </Form>
+              </>
+            )
+          },
+          {
+            key: "signup",
+            label: "Create Account",
+            children: (
+              <>
+                <p className="text-justify mb-sm">
+                  Create a fully independent account. No WaniKani required.
+                </p>
+                <Form
+                  layout="vertical"
+                  onFinish={(v) => registerStandaloneAccount(v.email, v.password, v.username).catch(() => setLoginFailed(true))}
+                >
+                  <Form.Item name="username" label="Username">
+                    <Input placeholder="Username (optional)" />
+                  </Form.Item>
+                  <Form.Item name="email" label="Email" required rules={[{ type: 'email', message: 'Enter a valid email' }]}>
+                    <Input placeholder="Email" />
+                  </Form.Item>
+                  <Form.Item name="password" label="Password" required rules={[{ min: 6, message: 'Password must be at least 6 characters' }]}>
+                    <Input.Password placeholder="Password" />
+                  </Form.Item>
+                  <Button type="primary" htmlType="submit" size="large" block className="bg-green-600 hover:bg-green-700 border-none">
+                    Create Standalone Account
+                  </Button>
+                </Form>
+              </>
+            )
+          }
+        ]}
+      />
 
       {/* Carousel on mobile */}
       {!md && <>

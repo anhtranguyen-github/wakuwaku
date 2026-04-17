@@ -44,6 +44,35 @@ export async function attemptLogIn(apiKey: string): Promise<void> {
   store.dispatch(setUser(user));
 }
 
+/** Registers a new standalone account and logs in automatically. */
+export async function registerStandaloneAccount(email?: string, password?: string, username?: string): Promise<void> {
+  debug("registering standalone account");
+
+  const response = await api.post<{ token: string }>("/auth/standalone/register", {
+    email,
+    password,
+    username
+  });
+  if (!response?.token) throw new Error("Registration failed");
+
+  debug("registration successful, logging in with token %s", response.token);
+  await attemptLogIn(response.token);
+}
+
+/** Logs in to a standalone account. */
+export async function loginStandaloneAccount(email?: string, password?: string): Promise<void> {
+  debug("logging in to standalone account");
+
+  const response = await api.post<{ token: string }>("/auth/standalone/login", {
+    email,
+    password
+  });
+  if (!response?.token) throw new Error("Login failed");
+
+  debug("login successful, token %s", response.token);
+  await attemptLogIn(response.token);
+}
+
 /** Clears all user data and logs out. */
 export async function logOut(): Promise<void> {
   debug("logging out");

@@ -65,8 +65,8 @@ Node.js v20 is required. Newer versions will not currently work.
 ```bash
 git clone https://github.com/Lemmmy/KanjiSchool.git
 cd KanjiSchool
-yarn install # Install the dependencies
-yarn dev # Run the development server
+bun install # Install the dependencies
+bun dev # Run the development server
 ```
 
 This project uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) as a standard for commit 
