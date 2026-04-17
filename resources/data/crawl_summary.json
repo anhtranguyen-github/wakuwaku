@@ -1,0 +1,861 @@
+{
+  "finished_at": "2026-04-17T05:59:17.655761Z",
+  "all_levels_valid": true,
+  "reports": [
+    {
+      "level": 1,
+      "total_count": 80,
+      "by_type": {
+        "radical": 25,
+        "kanji": 18,
+        "vocabulary": 37
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 2,
+      "total_count": 148,
+      "by_type": {
+        "radical": 33,
+        "kanji": 35,
+        "vocabulary": 78,
+        "kana_vocabulary": 2
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 3,
+      "total_count": 136,
+      "by_type": {
+        "radical": 30,
+        "kanji": 31,
+        "vocabulary": 69,
+        "kana_vocabulary": 6
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 4,
+      "total_count": 189,
+      "by_type": {
+        "radical": 36,
+        "kanji": 39,
+        "vocabulary": 107,
+        "kana_vocabulary": 7
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 5,
+      "total_count": 214,
+      "by_type": {
+        "radical": 29,
+        "kanji": 46,
+        "vocabulary": 133,
+        "kana_vocabulary": 6
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 6,
+      "total_count": 183,
+      "by_type": {
+        "radical": 21,
+        "kanji": 36,
+        "vocabulary": 119,
+        "kana_vocabulary": 7
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 7,
+      "total_count": 180,
+      "by_type": {
+        "radical": 20,
+        "kanji": 37,
+        "vocabulary": 121,
+        "kana_vocabulary": 2
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 8,
+      "total_count": 181,
+      "by_type": {
+        "radical": 14,
+        "kanji": 34,
+        "vocabulary": 127,
+        "kana_vocabulary": 6
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 9,
+      "total_count": 203,
+      "by_type": {
+        "radical": 19,
+        "kanji": 40,
+        "vocabulary": 139,
+        "kana_vocabulary": 5
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 10,
+      "total_count": 208,
+      "by_type": {
+        "radical": 17,
+        "kanji": 42,
+        "vocabulary": 142,
+        "kana_vocabulary": 7
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 11,
+      "total_count": 195,
+      "by_type": {
+        "radical": 14,
+        "kanji": 39,
+        "vocabulary": 142
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 12,
+      "total_count": 199,
+      "by_type": {
+        "radical": 12,
+        "kanji": 40,
+        "vocabulary": 146,
+        "kana_vocabulary": 1
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 13,
+      "total_count": 176,
+      "by_type": {
+        "radical": 16,
+        "kanji": 35,
+        "vocabulary": 123,
+        "kana_vocabulary": 2
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 14,
+      "total_count": 169,
+      "by_type": {
+        "radical": 7,
+        "kanji": 33,
+        "vocabulary": 129
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 15,
+      "total_count": 173,
+      "by_type": {
+        "radical": 9,
+        "kanji": 38,
+        "vocabulary": 124,
+        "kana_vocabulary": 2
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 16,
+      "total_count": 168,
+      "by_type": {
+        "radical": 5,
+        "kanji": 33,
+        "vocabulary": 129,
+        "kana_vocabulary": 1
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 17,
+      "total_count": 170,
+      "by_type": {
+        "radical": 9,
+        "kanji": 35,
+        "vocabulary": 125,
+        "kana_vocabulary": 1
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 18,
+      "total_count": 167,
+      "by_type": {
+        "radical": 8,
+        "kanji": 31,
+        "vocabulary": 127,
+        "kana_vocabulary": 1
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 19,
+      "total_count": 162,
+      "by_type": {
+        "radical": 6,
+        "kanji": 34,
+        "vocabulary": 122
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 20,
+      "total_count": 157,
+      "by_type": {
+        "radical": 6,
+        "kanji": 32,
+        "vocabulary": 119
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 21,
+      "total_count": 151,
+      "by_type": {
+        "radical": 8,
+        "kanji": 34,
+        "vocabulary": 109
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 22,
+      "total_count": 175,
+      "by_type": {
+        "radical": 10,
+        "kanji": 38,
+        "vocabulary": 127
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 23,
+      "total_count": 159,
+      "by_type": {
+        "radical": 7,
+        "kanji": 34,
+        "vocabulary": 118
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 24,
+      "total_count": 171,
+      "by_type": {
+        "radical": 7,
+        "kanji": 32,
+        "vocabulary": 132
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 25,
+      "total_count": 163,
+      "by_type": {
+        "radical": 7,
+        "kanji": 38,
+        "vocabulary": 117,
+        "kana_vocabulary": 1
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 26,
+      "total_count": 167,
+      "by_type": {
+        "radical": 7,
+        "kanji": 34,
+        "vocabulary": 126
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 27,
+      "total_count": 157,
+      "by_type": {
+        "radical": 8,
+        "kanji": 32,
+        "vocabulary": 117
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 28,
+      "total_count": 174,
+      "by_type": {
+        "radical": 7,
+        "kanji": 35,
+        "vocabulary": 132
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 29,
+      "total_count": 163,
+      "by_type": {
+        "radical": 6,
+        "kanji": 35,
+        "vocabulary": 122
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 30,
+      "total_count": 159,
+      "by_type": {
+        "radical": 6,
+        "kanji": 33,
+        "vocabulary": 119,
+        "kana_vocabulary": 1
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 31,
+      "total_count": 154,
+      "by_type": {
+        "radical": 6,
+        "kanji": 37,
+        "vocabulary": 111
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 32,
+      "total_count": 163,
+      "by_type": {
+        "radical": 6,
+        "kanji": 35,
+        "vocabulary": 122
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 33,
+      "total_count": 155,
+      "by_type": {
+        "radical": 8,
+        "kanji": 34,
+        "vocabulary": 113
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 34,
+      "total_count": 156,
+      "by_type": {
+        "radical": 5,
+        "kanji": 33,
+        "vocabulary": 118
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 35,
+      "total_count": 159,
+      "by_type": {
+        "radical": 5,
+        "kanji": 38,
+        "vocabulary": 116
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 36,
+      "total_count": 153,
+      "by_type": {
+        "radical": 3,
+        "kanji": 38,
+        "vocabulary": 111,
+        "kana_vocabulary": 1
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 37,
+      "total_count": 159,
+      "by_type": {
+        "radical": 5,
+        "kanji": 35,
+        "vocabulary": 119
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 38,
+      "total_count": 157,
+      "by_type": {
+        "radical": 5,
+        "kanji": 36,
+        "vocabulary": 116
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 39,
+      "total_count": 154,
+      "by_type": {
+        "radical": 9,
+        "kanji": 36,
+        "vocabulary": 109
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 40,
+      "total_count": 174,
+      "by_type": {
+        "radical": 5,
+        "kanji": 36,
+        "vocabulary": 133
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 41,
+      "total_count": 149,
+      "by_type": {
+        "radical": 6,
+        "kanji": 33,
+        "vocabulary": 110
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 42,
+      "total_count": 148,
+      "by_type": {
+        "radical": 5,
+        "kanji": 34,
+        "vocabulary": 109
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 43,
+      "total_count": 142,
+      "by_type": {
+        "radical": 3,
+        "kanji": 33,
+        "vocabulary": 106
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 44,
+      "total_count": 133,
+      "by_type": {
+        "radical": 2,
+        "kanji": 32,
+        "vocabulary": 99
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 45,
+      "total_count": 139,
+      "by_type": {
+        "radical": 2,
+        "kanji": 34,
+        "vocabulary": 103
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 46,
+      "total_count": 138,
+      "by_type": {
+        "radical": 1,
+        "kanji": 36,
+        "vocabulary": 101
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 47,
+      "total_count": 142,
+      "by_type": {
+        "radical": 3,
+        "kanji": 37,
+        "vocabulary": 102
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 48,
+      "total_count": 144,
+      "by_type": {
+        "radical": 2,
+        "kanji": 37,
+        "vocabulary": 104,
+        "kana_vocabulary": 1
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 49,
+      "total_count": 145,
+      "by_type": {
+        "radical": 3,
+        "kanji": 35,
+        "vocabulary": 107
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 50,
+      "total_count": 134,
+      "by_type": {
+        "radical": 3,
+        "kanji": 35,
+        "vocabulary": 96
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 51,
+      "total_count": 124,
+      "by_type": {
+        "radical": 1,
+        "kanji": 34,
+        "vocabulary": 89
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 52,
+      "total_count": 141,
+      "by_type": {
+        "radical": 1,
+        "kanji": 36,
+        "vocabulary": 104
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 53,
+      "total_count": 145,
+      "by_type": {
+        "radical": 1,
+        "kanji": 34,
+        "vocabulary": 110
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 54,
+      "total_count": 154,
+      "by_type": {
+        "kanji": 35,
+        "vocabulary": 119
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 55,
+      "total_count": 119,
+      "by_type": {
+        "radical": 2,
+        "kanji": 35,
+        "vocabulary": 82
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 56,
+      "total_count": 128,
+      "by_type": {
+        "kanji": 35,
+        "vocabulary": 93
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 57,
+      "total_count": 133,
+      "by_type": {
+        "radical": 2,
+        "kanji": 34,
+        "vocabulary": 97
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 58,
+      "total_count": 116,
+      "by_type": {
+        "kanji": 33,
+        "vocabulary": 83
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 59,
+      "total_count": 115,
+      "by_type": {
+        "radical": 1,
+        "kanji": 34,
+        "vocabulary": 80
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    },
+    {
+      "level": 60,
+      "total_count": 109,
+      "by_type": {
+        "kanji": 32,
+        "vocabulary": 77
+      },
+      "missing_characters": 0,
+      "missing_meanings": 0,
+      "missing_readings": 0,
+      "is_valid": true,
+      "errors": []
+    }
+  ]
+}
