@@ -490,3 +490,8 @@ class StudyMaterialUpdate(BaseModel):
 
 class AssignmentStart(BaseModel):
     started_at: Optional[datetime] = None
+
+
+class SyncRequest(BaseModel):
+    api_key: str
+    mode: str = "merge" # merge, overwrite

@@ -3,12 +3,15 @@ from typing import Optional, List
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Header
 from jose import jwt, JWTError
 from app.core.config import settings
+from app.db import get_supabase
+from supabase import Client
 from app.services.hanachan_service import HanachanService
 from app.schemas.hanachan_wanikani import (
     AssignmentStart,
     ReviewCreate,
     StudyMaterialCreate,
     StudyMaterialUpdate,
+    SyncRequest,
 )
 
 router = APIRouter()
@@ -51,8 +54,11 @@ def get_user_id_from_token(authorization: Optional[str] = Header(None)) -> str:
     )
 
 
-def get_service(user_id: str = Depends(get_user_id_from_token)) -> HanachanService:
-    return HanachanService(user_id)
+def get_service(
+    user_id: str = Depends(get_user_id_from_token),
+    db: Client = Depends(get_supabase)
+) -> HanachanService:
+    return HanachanService(db, user_id)
 
 
 @router.get("/user")
@@ -108,7 +114,7 @@ async def get_assignments(
 
 @router.get("/assignments/{assignment_id}")
 async def get_assignment(
-    assignment_id: int,
+    assignment_id: str,
     service: HanachanService = Depends(get_service),
 ):
     """Get a specific assignment"""
@@ -122,7 +128,7 @@ async def get_assignment(
 
 @router.put("/assignments/{assignment_id}/start")
 async def start_assignment(
-    assignment_id: int,
+    assignment_id: str,
     body: AssignmentStart,
     service: HanachanService = Depends(get_service),
 ):
@@ -137,7 +143,7 @@ async def start_assignment(
 
 @router.get("/level_progressions")
 async def get_level_progressions(
-    ids: Optional[List[int]] = Query(None),
+    ids: Optional[str] = Query(None),
     updated_after: Optional[datetime] = Query(None),
     service: HanachanService = Depends(get_service),
 ):
@@ -150,7 +156,7 @@ async def get_level_progressions(
 
 @router.get("/level_progressions/{progression_id}")
 async def get_level_progression(
-    progression_id: int,
+    progression_id: str,
     service: HanachanService = Depends(get_service),
 ):
     """Get a specific level progression"""
@@ -164,7 +170,7 @@ async def get_level_progression(
 
 @router.get("/resets")
 async def get_resets(
-    ids: Optional[List[int]] = Query(None),
+    ids: Optional[str] = Query(None),
     updated_after: Optional[datetime] = Query(None),
     service: HanachanService = Depends(get_service),
 ):
@@ -177,7 +183,7 @@ async def get_resets(
 
 @router.get("/resets/{reset_id}")
 async def get_reset(
-    reset_id: int,
+    reset_id: str,
     service: HanachanService = Depends(get_service),
 ):
     """Get a specific reset"""
@@ -191,10 +197,10 @@ async def get_reset(
 
 @router.get("/reviews")
 async def get_reviews(
-    ids: Optional[List[int]] = Query(None),
+    ids: Optional[str] = Query(None),
     updated_after: Optional[datetime] = Query(None),
-    assignment_ids: Optional[List[int]] = Query(None),
-    subject_ids: Optional[List[int]] = Query(None),
+    assignment_ids: Optional[str] = Query(None),
+    subject_ids: Optional[str] = Query(None),
     service: HanachanService = Depends(get_service),
 ):
     """Get all reviews"""
@@ -230,7 +236,7 @@ async def create_review(
 
 @router.get("/reviews/{review_id}")
 async def get_review(
-    review_id: int,
+    review_id: str,
     service: HanachanService = Depends(get_service),
 ):
     """Get a specific review"""
@@ -244,10 +250,10 @@ async def get_review(
 
 @router.get("/review_statistics")
 async def get_review_statistics(
-    ids: Optional[List[int]] = Query(None),
+    ids: Optional[str] = Query(None),
     updated_after: Optional[datetime] = Query(None),
     hidden: Optional[bool] = Query(None),
-    subject_ids: Optional[List[int]] = Query(None),
+    subject_ids: Optional[str] = Query(None),
     subject_types: Optional[List[str]] = Query(None),
     percentages_greater_than: Optional[int] = Query(None),
     percentages_less_than: Optional[int] = Query(None),
@@ -270,7 +276,7 @@ async def get_review_statistics(
 
 @router.get("/review_statistics/{statistic_id}")
 async def get_review_statistic(
-    statistic_id: int,
+    statistic_id: str,
     service: HanachanService = Depends(get_service),
 ):
     """Get a specific review statistic"""
@@ -285,9 +291,9 @@ async def get_review_statistic(
 @router.get("/spaced_repetition_systems")
 async def get_spaced_repetition_systems(
     hidden: Optional[bool] = Query(None),
-    ids: Optional[List[int]] = Query(None),
+    ids: Optional[str] = Query(None),
     updated_after: Optional[datetime] = Query(None),
-    subject_ids: Optional[List[int]] = Query(None),
+    subject_ids: Optional[str] = Query(None),
     subject_types: Optional[List[str]] = Query(None),
     service: HanachanService = Depends(get_service),
 ):
@@ -306,7 +312,7 @@ async def get_spaced_repetition_systems(
 
 @router.get("/spaced_repetition_systems/{srs_id}")
 async def get_spaced_repetition_system(
-    srs_id: int,
+    srs_id: str,
     service: HanachanService = Depends(get_service),
 ):
     """Get a specific spaced repetition system"""
@@ -320,7 +326,7 @@ async def get_spaced_repetition_system(
 
 @router.get("/study_materials")
 async def get_study_materials(
-    ids: Optional[List[int]] = Query(None),
+    ids: Optional[str] = Query(None),
     updated_after: Optional[datetime] = Query(None),
     service: HanachanService = Depends(get_service),
 ):
@@ -352,7 +358,7 @@ async def create_study_material(
 
 @router.get("/study_materials/{material_id}")
 async def get_study_material(
-    material_id: int,
+    material_id: str,
     service: HanachanService = Depends(get_service),
 ):
     """Get a specific study material"""
@@ -366,7 +372,7 @@ async def get_study_material(
 
 @router.put("/study_materials/{material_id}")
 async def update_study_material(
-    material_id: int,
+    material_id: str,
     body: StudyMaterialUpdate,
     service: HanachanService = Depends(get_service),
 ):
@@ -404,7 +410,10 @@ async def get_subjects(
     try:
         return await service.get_subjects(updated_after=updated_after)
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        import traceback
+        print(f"ERROR in get_subjects: {e}")
+        traceback.print_exc()
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/subjects/{subject_id}")
@@ -421,16 +430,8 @@ async def get_subject(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-# =============================================================================
 # Sync – replaces the crawl-wanikani Edge Function
 # =============================================================================
-from pydantic import BaseModel as PydanticBaseModel
-
-class SyncRequest(PydanticBaseModel):
-    api_key: str
-    type: Optional[str] = None
-
-
 @router.post("/sync")
 async def sync_wanikani(
     body: SyncRequest,
@@ -439,11 +440,14 @@ async def sync_wanikani(
     """
     Sync subjects, assignments, and review statistics from WaniKani.
     Replaces the crawl-wanikani Supabase Edge Function.
+    Modes:
+    - merge: Upsert data (current behavior)
+    - overwrite: Clear user data first, then sync
     """
     try:
         return await service.sync_wanikani(
             api_key=body.api_key,
-            subject_type=body.type,
+            mode=body.mode
         )
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

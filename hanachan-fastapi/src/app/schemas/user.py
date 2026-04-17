@@ -6,7 +6,12 @@ class UserBase(BaseModel):
     username: Optional[str] = None
 
 class UserCreate(UserBase):
-    password: Optional[str] = None
+    email: str
+    password: str
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
 
 class UserResponse(UserBase):
     id: str
