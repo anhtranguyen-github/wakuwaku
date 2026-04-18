@@ -6,7 +6,8 @@ import { useState, useCallback, useMemo, useContext, createContext, ReactNode } 
 import { Dropdown, MenuProps } from "antd";
 import {
   MoreOutlined, SettingOutlined, BugOutlined, SearchOutlined, ReadOutlined,
-  MacCommandOutlined, ReloadOutlined, GithubOutlined, UnorderedListOutlined
+  MacCommandOutlined, ReloadOutlined, GithubOutlined, UnorderedListOutlined,
+  UserOutlined, LogoutOutlined
 } from "@ant-design/icons";
 import useBreakpoint from "antd/es/grid/hooks/useBreakpoint";
 
@@ -20,6 +21,7 @@ import { MenuUserInfo } from "./UserInfo";
 import { dropdownOverlayClass, headerElementClass } from "./AppHeader.tsx";
 
 import { syncAll, useUsername } from "@api";
+import { openLogOutModal } from "@pages/settings/LogOutButton.tsx";
 
 import { useOnlineStatus } from "@utils/hooks";
 import { isLocalhost } from "@utils";
@@ -104,6 +106,14 @@ export function TopMenu(): JSX.Element {
         onClick: openHotkeyHelp
       },
 
+      {
+        key: "menu-profile",
+        icon: <UserOutlined />,
+        label: <ConditionalLink to="/profile" matchTo aria-label="Profile">
+          Profile
+        </ConditionalLink>
+      },
+
       // Settings item
       {
         key: "menu-settings",
@@ -121,6 +131,14 @@ export function TopMenu(): JSX.Element {
           Debug
         </ConditionalLink>
       } : null,
+
+      {
+        key: "menu-log-out",
+        icon: <LogoutOutlined />,
+        label: "Log out",
+        danger: true,
+        onClick: openLogOutModal
+      },
 
       { type: "divider" },
 

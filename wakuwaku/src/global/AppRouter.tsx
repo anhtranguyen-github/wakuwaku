@@ -32,6 +32,7 @@ export const router = createBrowserRouter([
       { path: "/items/joyo",       lazy: () => import("@pages/items/JoyoItemsPage.tsx") },
       { path: "/items/frequency",  lazy: () => import("@pages/items/FreqItemsPage.tsx") },
 
+      { path: "/profile",          lazy: () => import("@pages/profile/ProfilePage.tsx") },
       { path: "/settings",         lazy: () => import("@pages/settings/SettingsPage.tsx") },
       { path: "/debug",            lazy: () => import("@pages/debug/DebugPage.tsx") },
 

@@ -12,14 +12,14 @@ export function LogOutButton(): JSX.Element {
   return <Button
     type="link"
     danger
-    onClick={logOutModal}
+    onClick={openLogOutModal}
     className="float-right -my-[3px] -mx-[15px] !leading-none !h-auto"
   >
     Log out
   </Button>;
 }
 
-function logOutModal() {
+export function openLogOutModal() {
   const modal = globalModal.confirm({
     title: "Log out",
     icon: <LogoutOutlined className="!text-red" />,
