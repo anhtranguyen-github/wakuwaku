@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { DataPart } from "./analyze";
 import { JlptLevels, JoyoGrades } from "@data";
 import { gotoSearch, SearchParamsWithoutOrder } from "@api";
+import { nts } from "@utils";
 
 import { CardTable, CardTableCell, CardTableCellProps, CardTableRow } from "@pages/dashboard/CardTable.tsx";
 
@@ -39,6 +40,11 @@ export function KanjiProgressTable<T extends number>({
 
   if (!data || !totals) return null;
 
+  const formatCount = (value: number): string => nts(value);
+  const totalPercentage = totals.total > 0
+    ? ((totals.percentage / totals.total) * 100).toFixed(0)
+    : "0";
+
   return <CardTable headers={headers}>
     {/* Individual rows */}
     {keys.map(([k, name]) => {
@@ -66,24 +72,24 @@ export function KanjiProgressTable<T extends number>({
         burned={total === burned}
       >
         <CardTableCell {...cellProps}>{name}</CardTableCell>
-        <CardTableCell {...cellProps}>{total}</CardTableCell>
+        <CardTableCell {...cellProps}>{formatCount(total)}</CardTableCell>
         <CardTableCell {...cellProps}>{percentage.toFixed(0)}%</CardTableCell>
-        <CardTableCell {...cellProps}>{locked}</CardTableCell>
-        <CardTableCell {...cellProps}>{inProgress}</CardTableCell>
-        <CardTableCell {...cellProps}>{passed}</CardTableCell>
-        <CardTableCell {...cellProps}>{burned}</CardTableCell>
+        <CardTableCell {...cellProps}>{formatCount(locked)}</CardTableCell>
+        <CardTableCell {...cellProps}>{formatCount(inProgress)}</CardTableCell>
+        <CardTableCell {...cellProps}>{formatCount(passed)}</CardTableCell>
+        <CardTableCell {...cellProps}>{formatCount(burned)}</CardTableCell>
       </CardTableRow>;
     })}
 
     {/* Total row */}
     <CardTableRow className="font-bold bg-black/8">
       <CardTableCell>Total</CardTableCell>
-      <CardTableCell>{totals.total}</CardTableCell>
-      <CardTableCell>{((totals.percentage / totals.total) * 100).toFixed(0)}%</CardTableCell>
-      <CardTableCell>{totals.locked}</CardTableCell>
-      <CardTableCell>{totals.inProgress}</CardTableCell>
-      <CardTableCell>{totals.passed}</CardTableCell>
-      <CardTableCell>{totals.burned}</CardTableCell>
+      <CardTableCell>{formatCount(totals.total)}</CardTableCell>
+      <CardTableCell>{totalPercentage}%</CardTableCell>
+      <CardTableCell>{formatCount(totals.locked)}</CardTableCell>
+      <CardTableCell>{formatCount(totals.inProgress)}</CardTableCell>
+      <CardTableCell>{formatCount(totals.passed)}</CardTableCell>
+      <CardTableCell>{formatCount(totals.burned)}</CardTableCell>
     </CardTableRow>
   </CardTable>;
 }

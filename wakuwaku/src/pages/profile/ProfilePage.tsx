@@ -3,14 +3,14 @@
 // Full details: https://github.com/Lemmmy/WakuWaku/blob/master/LICENSE
 
 import { ReactNode } from "react";
-import { Button, Space, Tag } from "antd";
+import { Tag } from "antd";
 
 import { useUser } from "@api";
-import { ExtLink } from "@comp/ExtLink.tsx";
 import { SimpleCard } from "@comp/SimpleCard.tsx";
 import { PageLayout } from "@layout/PageLayout";
 import { SubscriptionStatus } from "@pages/dashboard/SubscriptionStatus.tsx";
 import { LogOutButton } from "@pages/settings/LogOutButton.tsx";
+import { WaniKaniSyncCard } from "./WaniKaniSyncCard.tsx";
 
 import { uppercaseFirst } from "@utils";
 
@@ -75,21 +75,7 @@ function ProfilePage(): JSX.Element | null {
       </div>
     </SimpleCard>
 
-    <SimpleCard title="Links" className="mb-md">
-      <Space wrap>
-        <ExtLink href={user.data.profile_url}>
-          <Button type="primary">Open WaniKani profile</Button>
-        </ExtLink>
-
-        <ExtLink href="https://www.wanikani.com/account">
-          <Button>Manage account</Button>
-        </ExtLink>
-
-        <ExtLink href="https://www.wanikani.com/account/subscription">
-          <Button>Manage subscription</Button>
-        </ExtLink>
-      </Space>
-    </SimpleCard>
+    <WaniKaniSyncCard />
   </PageLayout>;
 }
 

@@ -43,7 +43,7 @@ function getData(
 
     // Get the subject and assignment
     const subject = subjects[reviewStatistic.data.subject_id];
-    if (!subject) throw new Error("Review statistic refers to an invalid subject!");
+    if (!subject) continue;
     const assignment = assignments[subjectAssignmentIds[subject.id]];
     if (!assignment) continue;
 

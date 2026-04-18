@@ -86,6 +86,14 @@ export async function logOut(): Promise<void> {
   lsSetString("apiKey", null);
   lsSetObject("user", null);
 
+  await clearCachedUserProgressData();
+
+  // Unset the 'clearing data' flag finally
+  debug("done logging out, removing clearingData flag");
+  lsSetBoolean("clearingData", false);
+}
+
+export async function clearCachedUserProgressData(): Promise<void> {
   // Clear the user-relevant stores from the database
   debug("clearing user-relevant db stores");
   await Promise.all([
@@ -128,8 +136,4 @@ export async function logOut(): Promise<void> {
   lsSetString("sessionLastResults", null);
   lsSetString("sessionLastResultsViewed", null);
   lsSetString("selfStudyQueue", null);
-
-  // Unset the 'clearing data' flag finally
-  debug("done logging out, removing clearingData flag");
-  lsSetBoolean("clearingData", false);
 }

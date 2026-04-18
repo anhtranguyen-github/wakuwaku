@@ -20,8 +20,8 @@ export async function syncAll(full?: boolean): Promise<void> {
   }
 
   // Begin syncing subjects, then assignments (which will also update the user)
-  api.syncSubjects()
-    .then(() => Promise.all([
+  await api.syncSubjects();
+  await Promise.all([
       api.syncAssignments(full),
       api.syncReviewStatistics(full),
       api.syncReviews(full), // DO full refresh reviews
@@ -29,7 +29,7 @@ export async function syncAll(full?: boolean): Promise<void> {
       api.syncStudyMaterials(full),
       api.syncImages(),
       api.processQueue() // Process the submission queue if there's anything to
-    ]));
+    ]);
 }
 
 /**

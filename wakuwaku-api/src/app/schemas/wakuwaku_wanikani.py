@@ -138,6 +138,10 @@ class ApiReviewStatistic(BaseModel):
     data: ApiReviewStatisticInner
 
 
+class SyncPreflightRequest(BaseModel):
+    api_key: str
+
+
 class ApiReviewStatisticCollection(BaseModel):
     object: str = "collection"
     url: str

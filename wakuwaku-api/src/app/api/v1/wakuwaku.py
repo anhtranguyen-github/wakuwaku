@@ -12,6 +12,7 @@ from app.schemas.wakuwaku_wanikani import (
     StudyMaterialCreate,
     StudyMaterialUpdate,
     SyncRequest,
+    SyncPreflightRequest,
 )
 
 router = APIRouter()
@@ -87,6 +88,8 @@ async def get_assignments(
     subject_types: Optional[List[str]] = Query(None),
     unlocked: Optional[bool] = Query(None),
     updated_after: Optional[datetime] = Query(None),
+    page_after: int = Query(0, ge=0),
+    per_page: int = Query(500, ge=1, le=500),
     service: WakuWakuService = Depends(get_service),
 ):
     """Get all assignments"""
@@ -107,6 +110,8 @@ async def get_assignments(
             subject_types=subject_types,
             unlocked=unlocked,
             updated_after=updated_after,
+            page_after=page_after,
+            per_page=per_page,
         )
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -145,11 +150,18 @@ async def start_assignment(
 async def get_level_progressions(
     ids: Optional[str] = Query(None),
     updated_after: Optional[datetime] = Query(None),
+    page_after: int = Query(0, ge=0),
+    per_page: int = Query(500, ge=1, le=500),
     service: WakuWakuService = Depends(get_service),
 ):
     """Get all level progressions"""
     try:
-        return await service.get_level_progressions(ids=ids, updated_after=updated_after)
+        return await service.get_level_progressions(
+            ids=ids,
+            updated_after=updated_after,
+            page_after=page_after,
+            per_page=per_page,
+        )
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
@@ -172,11 +184,18 @@ async def get_level_progression(
 async def get_resets(
     ids: Optional[str] = Query(None),
     updated_after: Optional[datetime] = Query(None),
+    page_after: int = Query(0, ge=0),
+    per_page: int = Query(500, ge=1, le=500),
     service: WakuWakuService = Depends(get_service),
 ):
     """Get all resets"""
     try:
-        return await service.get_resets(ids=ids, updated_after=updated_after)
+        return await service.get_resets(
+            ids=ids,
+            updated_after=updated_after,
+            page_after=page_after,
+            per_page=per_page,
+        )
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
@@ -201,6 +220,8 @@ async def get_reviews(
     updated_after: Optional[datetime] = Query(None),
     assignment_ids: Optional[str] = Query(None),
     subject_ids: Optional[str] = Query(None),
+    page_after: int = Query(0, ge=0),
+    per_page: int = Query(500, ge=1, le=500),
     service: WakuWakuService = Depends(get_service),
 ):
     """Get all reviews"""
@@ -210,6 +231,8 @@ async def get_reviews(
             updated_after=updated_after,
             assignment_ids=assignment_ids,
             subject_ids=subject_ids,
+            page_after=page_after,
+            per_page=per_page,
         )
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -257,6 +280,8 @@ async def get_review_statistics(
     subject_types: Optional[List[str]] = Query(None),
     percentages_greater_than: Optional[int] = Query(None),
     percentages_less_than: Optional[int] = Query(None),
+    page_after: int = Query(0, ge=0),
+    per_page: int = Query(500, ge=1, le=500),
     service: WakuWakuService = Depends(get_service),
 ):
     """Get all review statistics"""
@@ -269,6 +294,8 @@ async def get_review_statistics(
             subject_types=subject_types,
             percentages_greater_than=percentages_greater_than,
             percentages_less_than=percentages_less_than,
+            page_after=page_after,
+            per_page=per_page,
         )
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -295,6 +322,8 @@ async def get_spaced_repetition_systems(
     updated_after: Optional[datetime] = Query(None),
     subject_ids: Optional[str] = Query(None),
     subject_types: Optional[List[str]] = Query(None),
+    page_after: int = Query(0, ge=0),
+    per_page: int = Query(500, ge=1, le=500),
     service: WakuWakuService = Depends(get_service),
 ):
     """Get all spaced repetition systems"""
@@ -305,6 +334,8 @@ async def get_spaced_repetition_systems(
             updated_after=updated_after,
             subject_ids=subject_ids,
             subject_types=subject_types,
+            page_after=page_after,
+            per_page=per_page,
         )
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -328,11 +359,18 @@ async def get_spaced_repetition_system(
 async def get_study_materials(
     ids: Optional[str] = Query(None),
     updated_after: Optional[datetime] = Query(None),
+    page_after: int = Query(0, ge=0),
+    per_page: int = Query(500, ge=1, le=500),
     service: WakuWakuService = Depends(get_service),
 ):
     """Get all study materials"""
     try:
-        return await service.get_study_materials(ids=ids, updated_after=updated_after)
+        return await service.get_study_materials(
+            ids=ids,
+            updated_after=updated_after,
+            page_after=page_after,
+            per_page=per_page,
+        )
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
@@ -404,11 +442,17 @@ async def get_summary(
 @router.get("/subjects")
 async def get_subjects(
     updated_after: Optional[datetime] = Query(None),
+    page_after: int = Query(0, ge=0),
+    per_page: int = Query(500, ge=1, le=500),
     service: WakuWakuService = Depends(get_service),
 ):
     """Get all subjects"""
     try:
-        return await service.get_subjects(updated_after=updated_after)
+        return await service.get_subjects(
+            updated_after=updated_after,
+            page_after=page_after,
+            per_page=per_page,
+        )
     except Exception as e:
         import traceback
         print(f"ERROR in get_subjects: {e}")
@@ -432,6 +476,20 @@ async def get_subject(
 
 # Sync – replaces the crawl-wanikani Edge Function
 # =============================================================================
+@router.post("/sync/preflight")
+async def sync_wanikani_preflight(
+    body: SyncPreflightRequest,
+    service: WakuWakuService = Depends(get_service),
+):
+    """Validate a WaniKani API key and compare it against the current account."""
+    try:
+        return await service.preflight_wanikani_sync(api_key=body.api_key)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
 @router.post("/sync")
 async def sync_wanikani(
     body: SyncRequest,

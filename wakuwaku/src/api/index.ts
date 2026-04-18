@@ -12,3 +12,4 @@ export * from "./search";
 export * from "./studyMaterials";
 export * from "./sync";
 export * from "./types";
+export * from "./wanikaniSync";
