@@ -128,7 +128,26 @@ async function underlyingRequest<T>(
       return queueRequest(method, endpoint, options, attempt + 1);
     }
 
-    const data = await res.json() as ApiResponseErrorable<T>;
+    const raw = await res.text();
+    let data: ApiResponseErrorable<T> | undefined;
+    try {
+      data = raw ? JSON.parse(raw) as ApiResponseErrorable<T> : undefined;
+    } catch {
+      data = undefined;
+    }
+
+    if (!res.ok) {
+      const message = data?.error
+        || (data as any)?.detail
+        || raw
+        || `Request failed with status ${res.status}`;
+      throw new ApiError(message, res.status);
+    }
+
+    if (!data) {
+      throw new ApiError("Empty response", res.status);
+    }
+
     if (data.error) {
       throw new ApiError(data.error || "unknown_error", data.code);
     }

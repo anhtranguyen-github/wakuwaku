@@ -5,9 +5,10 @@
 import { initDatabase } from "@db";
 import * as api from "@api";
 
-import { lsGetBoolean, lsGetString, getOnlineStatus } from "@utils";
+import { lsGetBoolean, lsGetObject, lsGetString, getOnlineStatus } from "@utils";
 
 import { globalNotification } from "@global/AntInterface.tsx";
+import { ApiUser } from "@api";
 
 import Debug from "debug";
 const debug = Debug("kanjischool:api-load-all");
@@ -57,7 +58,7 @@ export async function initDbAndLoadAll(): Promise<void> {
   // `user` cached in local storage, fetch it and store it now, otherwise
   // `loadAssignments` will fail. If the user is offline, then error and ask
   // them to go online.
-  if (lsGetString("apiKey") && !lsGetString("user")) {
+  if (lsGetString("apiKey") && !lsGetObject<ApiUser>("user")?.data?.id) {
     debug("init - user is missing, fetching now");
 
     // Must be online for the app to work now, bail out if we're offline

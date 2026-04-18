@@ -18,15 +18,15 @@ import Debug from "debug";
 const debug = Debug("kanjischool:api-auth");
 
 export const useIsLoggedIn = (): boolean =>
-  !!useAppSelector(s => s.auth.user?.data.id);
+  !!useAppSelector(s => s.auth.user?.data?.id);
 export const useUser = (): ApiUser | undefined =>
   useAppSelector(s => s.auth.user, shallowEqual);
 export const useUsername = (): string | undefined =>
-  useAppSelector(s => s.auth.user?.data.username);
+  useAppSelector(s => s.auth.user?.data?.username);
 export const useUserLevel = (): number =>
-  useAppSelector(s => s.auth.user?.data.level) || 1;
+  useAppSelector(s => s.auth.user?.data?.level) || 1;
 export const useUserMaxLevel = (): number =>
-  useAppSelector(s => s.auth.user?.data.subscription.max_level_granted) || 3;
+  useAppSelector(s => s.auth.user?.data?.subscription?.max_level_granted) || 3;
 
 /** Attempt to authenticate with the API using the specified API key. If it is
  * successful, save the API key. */

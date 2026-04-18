@@ -1,73 +1,103 @@
+import os
+from datetime import datetime, timedelta, timezone
+from uuid import uuid4
+
+import psycopg2
+from jose import jwt
+from passlib.context import CryptContext
+from psycopg2.extras import RealDictCursor
 from fastapi import APIRouter, status, HTTPException
-from app.services.wakuwaku_service import WakuWakuService
+
+from app.core.config import settings
 from app.schemas.user import UserCreate, UserLogin
-from app.db import get_supabase
 
 router = APIRouter()
+
+pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
+
+
+def get_db_conn():
+    database_url = os.getenv("DATABASE_URL")
+    if not database_url:
+        raise RuntimeError("DATABASE_URL is not configured")
+    return psycopg2.connect(database_url, cursor_factory=RealDictCursor)
+
+
+def create_access_token(user_id: str) -> str:
+    now = datetime.now(timezone.utc)
+    payload = {
+        "sub": user_id,
+        "role": "authenticated",
+        "iat": int(now.timestamp()),
+        "exp": int((now + timedelta(hours=1)).timestamp()),
+    }
+    return jwt.encode(payload, settings.SUPABASE_JWT_SECRET, algorithm="HS256")
 
 
 @router.post("/standalone/register", status_code=status.HTTP_201_CREATED)
 async def register_standalone(user_in: UserCreate):
-    """
-    Register a new user with Supabase Auth and seed Level 1 data.
-    """
-    supabase = get_supabase()
-    
+    username = user_in.username or user_in.email.split("@")[0]
+    password_hash = pwd_context.hash(user_in.password)
+    user_id = str(uuid4())
+
     try:
-        # 1. Register with Supabase Auth
-        # Note: Depending on Supabase settings, this might require email confirmation.
-        # If site_url and other settings are configured, this returns a user object.
-        auth_response = supabase.auth.sign_up({
-            "email": user_in.email,
-            "password": user_in.password,
-            "options": {
-                "data": {
-                    "username": user_in.username or user_in.email.split("@")[0]
-                }
-            }
-        })
-        
-        if not auth_response.user:
-            raise HTTPException(status_code=400, detail="Registration failed")
-            
-        user_id = auth_response.user.id
-        
-        # 2. Seed WakuWaku data
-        service = WakuWakuService(supabase, user_id)
-        await service.seed_standalone_user()
-        
-        # 3. Return session/token if available, otherwise just signal success
-        token = auth_response.session.access_token if auth_response.session else user_id
-        
+        with get_db_conn() as conn, conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO users (
+                    id, username, email, password_hash,
+                    level, max_level_granted, subscription_type,
+                    created_at, updated_at
+                )
+                VALUES (%s, %s, %s, %s, 1, 60, 'free', NOW(), NOW())
+                RETURNING id
+                """,
+                (user_id, username, user_in.email, password_hash),
+            )
+            row = cur.fetchone()
+
+        token = create_access_token(user_id)
         return {
-            "user_id": user_id,
+            "user_id": row["id"],
             "token": token,
             "type": "standalone"
         }
+    except psycopg2.errors.UniqueViolation:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/standalone/login")
 async def login_standalone(credentials: UserLogin):
-    """
-    Login with email/password via Supabase Auth.
-    """
-    supabase = get_supabase()
-    
     try:
-        auth_response = supabase.auth.sign_in_with_password({
-            "email": credentials.email,
-            "password": credentials.password
-        })
-        
-        if not auth_response.session:
-            raise HTTPException(status_code=401, detail="Invalid credentials or email not confirmed")
-            
+        with get_db_conn() as conn, conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT id, password_hash
+                FROM users
+                WHERE lower(email) = lower(%s)
+                LIMIT 1
+                """,
+                (credentials.email,),
+            )
+            user = cur.fetchone()
+
+        if not user or not user["password_hash"]:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+
+        if not pwd_context.verify(credentials.password, user["password_hash"]):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+
+        token = create_access_token(str(user["id"]))
         return {
-            "user_id": auth_response.user.id,
-            "token": auth_response.session.access_token,
+            "user_id": user["id"],
+            "token": token,
             "type": "standalone"
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=401, detail=str(e))

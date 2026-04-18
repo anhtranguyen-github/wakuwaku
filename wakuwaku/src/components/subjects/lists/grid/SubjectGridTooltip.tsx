@@ -2,18 +2,13 @@
 // This file is part of WakuWaku under AGPL-3.0.
 // Full details: https://github.com/Lemmmy/WakuWaku/blob/master/LICENSE
 
-import React, { forwardRef, ReactNode, RefObject } from "react";
+import React, { forwardRef, MutableRefObject, ReactNode, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
 interface Props {
   showTooltip?: boolean;
-  tooltipInnerRef?: RefObject<HTMLDivElement>;
+  tooltipInnerRef?: MutableRefObject<HTMLDivElement | null>;
   tooltipContents?: ReactNode;
-}
-
-function stopWheel(e: React.WheelEvent<HTMLDivElement>) {
-  e.preventDefault();
-  return false;
 }
 
 export const SubjectGridTooltip = forwardRef<HTMLDivElement, Props>(function TooltipPortal({
@@ -21,6 +16,20 @@ export const SubjectGridTooltip = forwardRef<HTMLDivElement, Props>(function Too
   tooltipInnerRef,
   tooltipContents
 }, ref): JSX.Element | null {
+  const wheelBlockRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const el = wheelBlockRef.current;
+    if (!el) return;
+
+    const stopWheel = (e: WheelEvent) => {
+      e.preventDefault();
+    };
+
+    el.addEventListener("wheel", stopWheel, { passive: false });
+    return () => el.removeEventListener("wheel", stopWheel);
+  }, [showTooltip]);
+
   return !showTooltip ? null : createPortal(<div
     ref={ref}
     className="absolute z-50 text-basec pointer-events-none w-0 h-0"
@@ -28,8 +37,12 @@ export const SubjectGridTooltip = forwardRef<HTMLDivElement, Props>(function Too
   >
     <div
       className="relative -left-[108px] -translate-y-full pb-lg pointer-events-auto"
-      ref={tooltipInnerRef}
-      onWheel={stopWheel}
+      ref={node => {
+        wheelBlockRef.current = node;
+        if (tooltipInnerRef) {
+          tooltipInnerRef.current = node;
+        }
+      }}
     >
       <div className="relative rounded shadow-md bg-spotlight !w-[200px] p-xs">
         {/* Tooltip arrow */}

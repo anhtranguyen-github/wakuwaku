@@ -1,10 +1,13 @@
 -- Hanachan Hanachan WaniKani API Database Schema (Standalone)
 
+CREATE SCHEMA IF NOT EXISTS auth;
+
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY,
     username TEXT,
     email TEXT,
+    password_hash TEXT,
     level INTEGER DEFAULT 1,
     max_level_granted INTEGER DEFAULT 60,
     subscription_type TEXT DEFAULT 'free',
@@ -180,6 +183,7 @@ CREATE INDEX IF NOT EXISTS idx_resets_user_id ON resets(user_id);
 CREATE INDEX IF NOT EXISTS idx_subjects_user_id ON subjects(user_id);
 CREATE INDEX IF NOT EXISTS idx_subjects_type ON subjects(type);
 CREATE INDEX IF NOT EXISTS idx_subjects_level ON subjects(level);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_unique ON users ((lower(email)));
 
 -- Create test user
 INSERT INTO users (id, username, email, level, max_level_granted, subscription_type) 

@@ -30,6 +30,8 @@ export function calculateNextReviews(
   const pendingReviews: AssignmentSubjectId[] = [];
   let nextReviewsAtRaw: string | undefined;
   let nextReviewsAt: Dayjs | undefined;
+  let nextReviewsBucketAtRaw: string | undefined;
+  let nextReviewsBucketAt: Dayjs | undefined;
   let nextReviewsNow = false;
   let nextReviewsCount = 0;
   let nextReviewsWeek = 0;
@@ -52,6 +54,8 @@ export function calculateNextReviews(
 
     // Calculate the 'next reviews at'
     if (srsStage !== 0 && srsStage !== 9 && available_at) {
+      const availableAt = dayjs(available_at);
+      const availableBucketAt = availableAt.startOf("hour");
       const availableNow = now.isSameOrAfter(available_at);
 
       // If this is within the next week, and is not available now, add to the
@@ -67,20 +71,27 @@ export function calculateNextReviews(
           nextReviewsNow = true;
           nextReviewsCount = 1;
           nextReviewsAtRaw = available_at;
-          nextReviewsAt = dayjs(available_at);
+          nextReviewsAt = availableAt;
+          nextReviewsBucketAtRaw = availableBucketAt.toISOString();
+          nextReviewsBucketAt = availableBucketAt;
         } else {
           nextReviewsCount++;
         }
-      } else if (!nextReviewsAt || nextReviewsAt.isAfter(available_at)) {
-        // If this review is earlier than our current known earliest one, reset
-        // too:
+      } else if (!nextReviewsBucketAt || nextReviewsBucketAt.isAfter(availableBucketAt)) {
+        // If this review falls in an earlier hour bucket than our current
+        // known earliest one, reset the summary count to this bucket.
         nextReviewsCount = 1;
         nextReviewsAtRaw = available_at;
-        nextReviewsAt = dayjs(available_at);
-      } else if (nextReviewsAtRaw === available_at) {
-        // Otherwise, if this is the same as our current time bucket, just
-        // increment the count:
+        nextReviewsAt = availableAt;
+        nextReviewsBucketAtRaw = availableBucketAt.toISOString();
+        nextReviewsBucketAt = availableBucketAt;
+      } else if (nextReviewsBucketAtRaw === availableBucketAt.toISOString()) {
+        // Otherwise, if this is in the same hour bucket, increment the count.
         nextReviewsCount++;
+        if (!nextReviewsAt || nextReviewsAt.isAfter(availableAt)) {
+          nextReviewsAtRaw = available_at;
+          nextReviewsAt = availableAt;
+        }
       }
     }
   }

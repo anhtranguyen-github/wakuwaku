@@ -12,9 +12,28 @@ export interface AuthSliceState {
   readonly user?: ApiUser;
 }
 
+function isValidStoredUser(user: unknown): user is ApiUser {
+  if (!user || typeof user !== "object") return false;
+
+  const maybeUser = user as Partial<ApiUser> & {
+    data?: {
+      id?: unknown;
+      subscription?: {
+        max_level_granted?: unknown;
+      };
+    };
+  };
+
+  return typeof maybeUser.data?.id === "string"
+    && typeof maybeUser.data?.subscription?.max_level_granted === "number";
+}
+
 export const initialState = (): AuthSliceState => ({
   apiKey: lsGetString("apiKey"),
-  user: lsGetObject<ApiUser>("user")
+  user: (() => {
+    const storedUser = lsGetObject<unknown>("user");
+    return isValidStoredUser(storedUser) ? storedUser : undefined;
+  })()
 });
 
 const authSlice = createSlice({
