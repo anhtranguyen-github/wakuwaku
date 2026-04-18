@@ -50,7 +50,7 @@ function getData(
 
 export function LevelInfoRow(): JSX.Element {
   const user = useUser();
-  const maxLevel = user?.data.subscription.max_level_granted || 3;
+  const maxLevel = user?.data.subscription.max_level_granted || 60;
   const subjects = useSubjects();
   const levelProgressions = useLevelProgressions();
 
@@ -65,17 +65,15 @@ export function LevelInfoRow(): JSX.Element {
   >
     {user !== undefined && (
       <LevelInfoRowPart label="Current level">
-        {Math.min(user.data.level, maxLevel)} / {maxLevel}
+        {user.data.level}
       </LevelInfoRowPart>
     )}
 
-    {(user?.data.level || 1) <= maxLevel && (
       <LevelInfoRowPart label="Time on level">
         {data?.timeOnLevel !== undefined
           ? <DhmDuration seconds={data.timeOnLevel} showYears short={!xl} />
           : <span className="text-desc-c/35 italic">Not started yet</span>}
       </LevelInfoRowPart>
-    )}
 
     {xl && data?.startDate !== undefined && data?.startDateSeconds !== undefined && (
       <Tooltip title={data.startDate.toLocaleString()}>

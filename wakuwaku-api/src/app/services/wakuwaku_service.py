@@ -694,9 +694,7 @@ class WakuWakuService:
         per_page: int = DEFAULT_COLLECTION_PAGE_SIZE
     ) -> dict:
         await self.ensure_user_learning_state()
-        user_res = self.client.table("users").select("level").eq("id", self.user_id).limit(1).execute()
-        user_level = max(int((user_res.data or [{"level": 1}])[0].get("level") or 1), 1)
-        subject_rows = await self._get_template_subjects(level=user_level)
+        subject_rows = await self._get_template_subjects()
         assignment_res = self.client.table("assignments").select("subject_id").eq("user_id", self.user_id).execute()
         assigned_subject_ids = [row["subject_id"] for row in (assignment_res.data or [])]
         assigned_subject_rows = await self._get_template_subjects(ids=assigned_subject_ids) if assigned_subject_ids else []
@@ -1803,13 +1801,12 @@ class WakuWakuService:
             })
         total_reviews = await self._upsert_review_rows(review_rows)
 
-        subscription = wk_user.get("subscription") or {}
         self.client.table("users").update({
             "username": wk_user.get("username"),
             "level": wk_user.get("level") or 1,
-            "max_level_granted": subscription.get("max_level_granted") or 60,
-            "subscription_type": subscription.get("type") or "free",
-            "subscription_ends_at": subscription.get("period_ends_at"),
+            "max_level_granted": 60,
+            "subscription_type": "lifetime",
+            "subscription_ends_at": None,
             "updated_at": datetime.utcnow().isoformat(),
         }).eq("id", self.user_id).execute()
 

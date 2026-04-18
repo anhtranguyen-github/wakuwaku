@@ -26,7 +26,7 @@ export const useUsername = (): string | undefined =>
 export const useUserLevel = (): number =>
   useAppSelector(s => s.auth.user?.data?.level) || 1;
 export const useUserMaxLevel = (): number =>
-  useAppSelector(s => s.auth.user?.data?.subscription?.max_level_granted) || 3;
+  useAppSelector(s => s.auth.user?.data?.subscription?.max_level_granted) || 60;
 
 /** Attempt to authenticate with the API using the specified API key. If it is
  * successful, save the API key. */

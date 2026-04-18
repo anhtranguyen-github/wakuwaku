@@ -57,8 +57,6 @@ function getData(
     // Ignore invalid subjects
     if (!subject || subject.data.hidden_at) continue;
 
-    // If on a free subscription, remove subjects outside of max level
-    if (subject.data.level > maxLevel) continue;
 
     // Figure out if this is a lesson or a review
     const type = assignment.data.started_at ? "reviews" : "lessons";

@@ -41,8 +41,7 @@ function ProfilePage(): JSX.Element | null {
       </div>
 
       <div className="grid gap-md md:grid-cols-2 leading-normal">
-        <ProfileField label="Current level" value={`Level ${level}`} />
-        <ProfileField label="Access limit" value={`Up to level ${sub.max_level_granted}`} />
+        <ProfileField label="Current level" value={`Level ${user.data.level}`} />
         <ProfileField
           label="Subscription"
           value={<div className="flex items-center gap-xs">
