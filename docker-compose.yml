@@ -4,7 +4,7 @@ services:
   # --- Database ---
   db:
     image: supabase/postgres:15.1.1.78
-    container_name: hanachan-db
+    container_name: wakuwaku-db
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
     ports:
       - "7432:5432"
@@ -24,7 +24,7 @@ services:
   # --- Supabase Components ---
   auth:
     image: supabase/gotrue:v2.132.3
-    container_name: hanachan-auth
+    container_name: wakuwaku-auth
     ports:
       - "7300:9999"
     depends_on:
@@ -41,7 +41,7 @@ services:
 
   rest:
     image: postgrest/postgrest:v12.0.1
-    container_name: hanachan-rest
+    container_name: wakuwaku-rest
     ports:
       - "7500:3000"
     depends_on:
@@ -53,17 +53,17 @@ services:
       - PGRST_DB_ANON_ROLE=anon
       - PGRST_JWT_SECRET=${SUPABASE_JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
 
-  # --- Hanachan Backend ---
+  # --- WakuWaku Backend ---
   backend:
     build:
-      context: ./hanachan-fastapi
+      context: ./wakuwaku-api
       dockerfile: Dockerfile
-    container_name: hanachan-backend
+    container_name: wakuwaku-backend
     restart: always
     ports:
       - "7000:8000"
     volumes:
-        - ./hanachan-fastapi/src:/app/src
+        - ./wakuwaku-api/src:/app/src
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
       - SUPABASE_URL=http://rest:3000
@@ -71,7 +71,7 @@ services:
       - SUPABASE_JWT_SECRET=${SUPABASE_JWT_SECRET}
       - APP_BASE_URL=${APP_BASE_URL:-http://localhost:7000}
       - API_V1_STR=/v2
-      - PROJECT_NAME=Hanachan WaniKani
+      - PROJECT_NAME=WakuWaku SRS
       - VERSION=20170710
       - PYTHONPATH=/app/src
     depends_on:
@@ -80,12 +80,12 @@ services:
     env_file:
       - .env
 
-  # --- Seeder (Uses backend image to run Python import) ---
+  # --- Seeder ---
   seeder:
     build:
-      context: ./hanachan-fastapi
+      context: ./wakuwaku-api
       dockerfile: Dockerfile
-    container_name: hanachan-seeder
+    container_name: wakuwaku-seeder
     depends_on:
       db:
         condition: service_healthy
@@ -98,23 +98,22 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    # The .venv is already in /app/.venv from the Dockerfile
     command: >
       sh -c "sleep 5 && python scripts/seed_supabase.py"
 
   # --- Frontend ---
   nginx:
     image: nginx:alpine
-    container_name: hanachan-nginx
+    container_name: wakuwaku-nginx
     restart: always
     ports:
       - "7100:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./kanjischool/dist:/usr/share/nginx/html:ro
+      - ./wakuwaku/dist:/usr/share/nginx/html:ro
     depends_on:
       - backend
 
 networks:
   default:
-    name: hanachan-network
+    name: wakuwaku-network

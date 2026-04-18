@@ -1,0 +1,12 @@
+// Copyright (c) 2021-2025 Drew Edwards
+// This file is part of WakuWaku under AGPL-3.0.
+// Full details: https://github.com/Lemmmy/WakuWaku/blob/master/LICENSE
+
+export * from "./charBlocks";
+export * from "./digraphMatch";
+export * from "./ja";
+export * from "./jisho";
+export * from "./meaningMatch";
+export * from "./partsOfSpeech";
+export * from "./srs";
+export * from "./subjects";

@@ -81,3 +81,4 @@ kanjischool/dist/
 *.pid
 
 node_modules/
+supabase/db/data/
